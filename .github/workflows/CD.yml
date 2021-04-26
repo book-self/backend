@@ -55,7 +55,7 @@ jobs:
 
         echo "Updating symlink used by daemon..."
         ssh -F ./sshconfig $EC2_HOST ln -v -s -f /var/bookself/$JAR_NAME /var/bookself/current-backend.jar
-        
+
         echo "Starting bookself service..."
         ssh -F ./sshconfig $EC2_HOST sudo systemctl start bookself
       env:

@@ -20,7 +20,9 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 	implementation 'org.flywaydb:flyway-core'
 	implementation 'org.postgresql:postgresql'
+	
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	testRuntime 'com.h2database:h2'
 }
 
 // Setup Jacoco to generate the xml report
