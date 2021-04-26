@@ -49,10 +49,13 @@ jobs:
 
         echo "Stopping bookself service..."
         ssh -F ./sshconfig $EC2_HOST sudo systemctl stop bookself
+
         echo "Copying built jar to server..."
         scp -F ./sshconfig build/libs/$JAR_NAME $EC2_HOST:/var/bookself/
+
         echo "Updating symlink used by daemon..."
         ssh -F ./sshconfig $EC2_HOST ln -v -s -f /var/bookself/$JAR_NAME /var/bookself/current-backend.jar
+        
         echo "Starting bookself service..."
         ssh -F ./sshconfig $EC2_HOST sudo systemctl start bookself
       env:
