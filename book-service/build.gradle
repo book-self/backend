@@ -4,6 +4,7 @@ import static config.Dependencies.*;
 plugins {
     id 'org.springframework.boot'
     id 'io.spring.dependency-management'
+    id 'io.freefair.lombok'
     id 'java'
     id 'jacoco'
 }
@@ -27,7 +28,7 @@ jar {
 dependencies {
     implementation springBootStarter
     implementation springBootStarterActuator
-    implementation springBootStarterJdbc
+    implementation springBootStarterDataJpa
     implementation postgresql
 
     testImplementation springBootStarterTest
