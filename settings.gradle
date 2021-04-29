@@ -8,3 +8,5 @@ pluginManagement {
 rootProject.name = 'backend'
 include 'book-management'
 include 'book-service'
+include 'user-service'
+

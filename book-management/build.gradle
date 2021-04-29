@@ -17,6 +17,9 @@ repositories {
 }
 
 dependencies {
+	implementation project(':book-service')
+	implementation project(':user-service')
+	
 	implementation springBootStarter
 	implementation springBootStarterWeb
 	implementation springBootStarterActuator
