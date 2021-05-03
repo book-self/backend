@@ -1,6 +1,6 @@
-package books.repository;
+package xyz.bookself.books.repository;
 
-import books.domain.Book;
+import xyz.bookself.books.domain.Book;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
