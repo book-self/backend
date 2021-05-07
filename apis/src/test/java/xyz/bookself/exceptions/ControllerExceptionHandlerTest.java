@@ -31,7 +31,7 @@ class ControllerExceptionHandlerTest {
     void givenBookDoesNotExist_whenGetBookIsRequested_thenResponseShouldBe404AndBodyShouldContainPath()
             throws Exception {
 
-        final String pathToNonExistentResource = "/book/10000000000";
+        final String pathToNonExistentResource = "/v1/book/10000000000";
 
         when(bookRepository.findById(pathToNonExistentResource)).thenThrow(NoSuchElementException.class);
 

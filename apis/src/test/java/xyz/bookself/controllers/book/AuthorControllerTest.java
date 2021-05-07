@@ -37,7 +37,7 @@ class AuthorControllerTest {
 
         when(authorRepository.findById(existingAuthorId)).thenReturn(Optional.of(author));
 
-        mockMvc.perform(get("/author/" + existingAuthorId))
+        mockMvc.perform(get("/v1/author/" + existingAuthorId))
                 .andExpect(status().isOk())
                 .andExpect(content().json(jsonContent));
     }
