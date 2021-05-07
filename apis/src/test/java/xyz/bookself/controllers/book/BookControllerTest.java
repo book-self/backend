@@ -1,7 +1,5 @@
 package xyz.bookself.controllers.book;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -53,7 +51,7 @@ class BookControllerTest {
 
         when(bookRepository.save(newBook)).thenReturn(newBook);
 
-        final String jsonContent = toJsonString(newBook);
+        final String jsonContent = TestUtilities.toJsonString(newBook);
 
         mockMvc.perform(
                 post("/book/save")
@@ -61,10 +59,5 @@ class BookControllerTest {
                         .content(jsonContent))
                 .andExpect(status().isOk())
                 .andExpect(content().json(jsonContent));
-    }
-
-    private String toJsonString(Object o) throws JsonProcessingException {
-        final ObjectMapper mapper = new ObjectMapper();
-        return mapper.writeValueAsString(o);
     }
 }
