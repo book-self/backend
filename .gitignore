@@ -3,10 +3,6 @@ HELP.md
 # Gradle
 .gradle
 **/build/
-**/bin/
-**/.project
-**/.settings/
-**/.classpath
 !src/**/build/
 !gradle-wrapper.jar
 .gradletasknamecache
@@ -24,7 +20,7 @@ out/
 # Mac
 .DS_Store
 
-### STS ###
+# STS
 .apt_generated
 .classpath
 .factorypath
@@ -36,12 +32,12 @@ bin/
 !**/src/main/**/bin/
 !**/src/test/**/bin/
 
-### NetBeans ###
+# NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbdist/
 /.nb-gradle/
 
-### VS Code ###
+# VS Code
 .vscode/

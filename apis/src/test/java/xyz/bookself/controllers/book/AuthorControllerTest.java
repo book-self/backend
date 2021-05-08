@@ -20,6 +20,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 class AuthorControllerTest {
 
+    private final String apiPrefix = "/v1/authors";
+
     @Autowired
     private MockMvc mockMvc;
 
@@ -37,7 +39,7 @@ class AuthorControllerTest {
 
         when(authorRepository.findById(existingAuthorId)).thenReturn(Optional.of(author));
 
-        mockMvc.perform(get("/v1/author/" + existingAuthorId))
+        mockMvc.perform(get(apiPrefix + "/" + existingAuthorId))
                 .andExpect(status().isOk())
                 .andExpect(content().json(jsonContent));
     }

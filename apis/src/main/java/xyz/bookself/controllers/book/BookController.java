@@ -6,8 +6,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -16,10 +14,11 @@ import xyz.bookself.books.domain.Book;
 import xyz.bookself.books.repository.BookRepository;
 
 import java.util.Collection;
-import java.util.Optional;
+import java.util.HashSet;
+import java.util.List;
 
 @RestController
-@RequestMapping("/v1/book")
+@RequestMapping("/v1/books")
 @Slf4j
 public class BookController {
 
@@ -36,17 +35,17 @@ public class BookController {
         return new ResponseEntity<>(book, HttpStatus.OK);
     }
 
-    @GetMapping("/list")
-    public ResponseEntity<Collection<Book>> getBooksByAuthor(@RequestParam(name = "authorId") Optional<String> id) {
-        final String authorId = id.orElse("");
+    @GetMapping("/by-author")
+    public ResponseEntity<Collection<Book>> getBooksByAuthor(@RequestParam String authorId) {
         final Author a = new Author();
         a.setId(authorId);
         final Collection<Book> books = bookRepository.findAllByAuthorsContains(a);
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
-    @PostMapping("/save")
-    public ResponseEntity<Book> saveBook(@RequestBody Book book) {
-        return new ResponseEntity<>(bookRepository.save(book), HttpStatus.OK);
+    @GetMapping("/by-genre")
+    public ResponseEntity<Collection<Book>> getBooksByGenre(@RequestParam List<String> genres) {
+        final Collection<Book> books = bookRepository.findAllByGenresIn(new HashSet<>(genres));
+        return new ResponseEntity<>(books, HttpStatus.OK);
     }
 }

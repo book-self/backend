@@ -1,0 +1,3 @@
+bookself:
+  api:
+    max-rows: 50

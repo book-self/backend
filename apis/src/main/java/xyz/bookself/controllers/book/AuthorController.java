@@ -11,7 +11,7 @@ import xyz.bookself.books.domain.Author;
 import xyz.bookself.books.repository.AuthorRepository;
 
 @RestController
-@RequestMapping("/v1/author")
+@RequestMapping("/v1/authors")
 public class AuthorController {
 
     private final AuthorRepository authorRepository;

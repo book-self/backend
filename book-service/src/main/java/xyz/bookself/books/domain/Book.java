@@ -1,6 +1,5 @@
 package xyz.bookself.books.domain;
 
-import lombok.Data;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
