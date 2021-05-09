@@ -50,7 +50,7 @@ public class UserController {
         newUser.setCreated(date);
         userRepository.save(newUser);
 
-        return "/newUser";
+        return "redirect:newBookLists";
     }
 
 }
