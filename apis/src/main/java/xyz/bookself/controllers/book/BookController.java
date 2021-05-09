@@ -12,20 +12,21 @@ import org.springframework.web.bind.annotation.RestController;
 import xyz.bookself.books.domain.Author;
 import xyz.bookself.books.domain.Book;
 import xyz.bookself.books.repository.BookRepository;
+import xyz.bookself.config.BookselfApiConfiguration;
 
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.List;
 
 @RestController
 @RequestMapping("/v1/books")
 @Slf4j
 public class BookController {
 
+    private final BookselfApiConfiguration apiConfiguration;
     private final BookRepository bookRepository;
 
     @Autowired
-    public BookController(BookRepository repository) {
+    public BookController(BookselfApiConfiguration configuration, BookRepository repository) {
+        this.apiConfiguration = configuration;
         this.bookRepository = repository;
     }
 
@@ -37,20 +38,19 @@ public class BookController {
 
     @GetMapping("/by-author")
     public ResponseEntity<Collection<Book>> getBooksByAuthor(@RequestParam String authorId) {
-        final Author a = new Author();
-        a.setId(authorId);
-        final Collection<Book> books = bookRepository.findAllByAuthorsContains(a);
+        final Collection<Book> books = bookRepository.findAllByAuthor(authorId, apiConfiguration.getMaxReturnedBooks());
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
     @GetMapping("/by-genre")
-    public ResponseEntity<Collection<Book>> getBooksByGenre(@RequestParam List<String> genres) {
-        final Collection<Book> books = bookRepository.findAllByGenresIn(new HashSet<>(genres));
+    public ResponseEntity<Collection<Book>> getBooksByGenre(@RequestParam String genre) {
+        final Collection<Book> books = bookRepository.findAllByGenre(genre, apiConfiguration.getMaxReturnedBooks());
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
 
     @GetMapping("/all")
-    public Collection<Book> getAllBooks() {
-        return bookRepository.findTenBooks();
+    public ResponseEntity<Collection<Book>> getBooks() {
+        final Collection<Book> books =  bookRepository.findAnyBooks(apiConfiguration.getMaxReturnedBooks());
+        return new ResponseEntity<>(books, HttpStatus.OK);
     }
 }

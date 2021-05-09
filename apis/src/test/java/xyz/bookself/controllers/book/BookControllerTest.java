@@ -2,6 +2,7 @@ package xyz.bookself.controllers.book;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -10,6 +11,7 @@ import xyz.bookself.books.domain.Author;
 import xyz.bookself.books.domain.Book;
 import xyz.bookself.books.repository.BookRepository;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Optional;
@@ -33,6 +35,12 @@ class BookControllerTest {
 
     @MockBean
     private BookRepository bookRepository;
+
+    @Value("${bookself.api.max-returned-books}")
+    private int maxReturnedBooks;
+
+    @Value("${bookself.api.max-returned-genres}")
+    private int maxReturnedGenres;
 
     @Test
     void givenBookExists_whenIdIsSuppliedToBookEndpoint_thenBookIsReturned()
@@ -61,10 +69,25 @@ class BookControllerTest {
                 }).collect(Collectors.toSet());
         final String jsonContent = TestUtilities.toJsonString(books);
 
-        when(bookRepository.findAllByAuthorsContains(author)).thenReturn(books);
+        when(bookRepository.findAllByAuthor(validAuthorId, maxReturnedBooks)).thenReturn(books);
 
         mockMvc.perform(get(apiPrefix + "/by-author?authorId=" + validAuthorId))
                 .andExpect(status().isOk())
                 .andExpect(content().json(jsonContent));
+    }
+
+    @Test
+    void givenThereAreEnoughBooks_whenGetRequestedToBooksAll_thenSixtyBooksAreReturned() throws Exception {
+        final Collection<Book> sixtyBooks = IntStream.range(0, maxReturnedBooks).mapToObj(i -> {
+            Book b = new Book();
+            b.setId("_" + i);
+            return b;
+        }).collect(Collectors.toSet());
+
+        when(bookRepository.findAnyBooks(maxReturnedBooks)).thenReturn(sixtyBooks);
+
+        mockMvc.perform(get(apiPrefix + "/all"))
+                .andExpect(status().isOk())
+                .andExpect(content().json(TestUtilities.toJsonString(sixtyBooks)));
     }
 }
