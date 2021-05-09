@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 import xyz.bookself.books.domain.Book;
 import xyz.bookself.config.BookselfApiConfiguration;
 import xyz.bookself.users.domain.BookList;
+import xyz.bookself.users.domain.BookListEnum;
 import xyz.bookself.users.repository.BookListRepository;
 import xyz.bookself.users.repository.UserRepository;
 
@@ -22,12 +23,30 @@ public class BookListController
         this.apiConfiguration = configuration;
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/booklist/{id}")
     public ResponseEntity<BookList> getBookList(@PathVariable String bookListId) {
         final BookList bookList = bookListRepository.findById(bookListId).orElseThrow();
         return new ResponseEntity<>(bookList, HttpStatus.OK);
     }
 
+    @PostMapping("/newUser/booklists")
+    public ResponseEntity<BookList>generateBookList(){
+       BookList newDNF = new BookList();
+       BookList newCurrent = new BookList();
+       BookList newRead = new BookList();
+       BookList newTBR = new BookList();
+
+       newDNF.setListType(BookListEnum.DNF);
+       newCurrent.setListType(BookListEnum.READING);
+       newRead.setListType(BookListEnum.READ);
+       newTBR.setListType(BookListEnum.TOREAD);
+       bookListRepository.save(newDNF);
+       bookListRepository.save(newCurrent);
+       bookListRepository.save(newRead);
+       bookListRepository.save(newTBR);
+
+        return new ResponseEntity<>(newDNF, HttpStatus.OK);
+    }
     @PostMapping("/addBook")
     public ResponseEntity<BookList>addBookToList(@RequestParam String bookListId, @RequestParam String bookId)
     {
