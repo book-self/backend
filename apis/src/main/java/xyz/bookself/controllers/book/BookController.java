@@ -48,4 +48,9 @@ public class BookController {
         final Collection<Book> books = bookRepository.findAllByGenresIn(new HashSet<>(genres));
         return new ResponseEntity<>(books, HttpStatus.OK);
     }
+
+    @GetMapping("/all")
+    public Collection<Book> getAllBooks() {
+        return bookRepository.findTenBooks();
+    }
 }
