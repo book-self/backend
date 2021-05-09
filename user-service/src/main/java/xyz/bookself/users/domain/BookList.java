@@ -21,6 +21,14 @@ public class BookList {
     @Column(name = "book_in_list")
     private Set<String> books= new HashSet<>();
 
+    public void addBook(String bookId)
+    {
+        if(!(books.contains(bookId)) {
+            books.add(bookId);
+        }
+        }
+    }
+
 }
 
 
