@@ -20,6 +20,16 @@ JDK 11 is required to build and run this application.
 
 Since we're using the Gradle Wrapper, there is no need to install Gradle locally. Just use `./gradlew` or `gradle.bat`.
 
+### Required Environment Variables
+Environment Variable | Default | Description
+-------------------- | ------- | -----------
+`BOOKSELF_DB_HOST` | `localhost` | The database host
+`BOOKSELF_DB_NAME` | `bookself` | The database name
+`BOOKSELF_DB_PORT` | `5432` | The database port. Defaults to `5432`
+`BOOKSELF_DB_USER` | `postgres` | The db user name
+`BOOKSELF_DB_PASS` |  | The db password
+`BOOKSELF_CORS_ALLOWED_ORIGINS` | `*` | CORS allowed origins (Should be the front-end url unless we want to allow all origins)
+
 ### Running the Backend Application
 `$ ./gradlew :apis:bootRun`
 
