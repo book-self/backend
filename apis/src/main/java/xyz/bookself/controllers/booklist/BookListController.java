@@ -23,14 +23,17 @@ public class BookListController
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<BookList> getBook(@PathVariable String bookListId) {
+    public ResponseEntity<BookList> getBookList(@PathVariable String bookListId) {
         final BookList bookList = bookListRepository.findById(bookListId).orElseThrow();
         return new ResponseEntity<>(bookList, HttpStatus.OK);
     }
 
     @PostMapping("/addBook")
-    public ResponseEntity<BookList>addBookToList(@RequestParam String bookListId)
+    public ResponseEntity<BookList>addBookToList(@RequestParam String bookListId, @RequestParam String bookId)
     {
+        final BookList bookList = bookListRepository.findById(bookListId).orElseThrow();
+        bookList.addBook(bookId);
+        return new ResponseEntity<>(bookList, HttpStatus.OK);
 
     }
 }
