@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.UUID;
 
 import javax.persistence.*;
 
@@ -23,13 +24,12 @@ public class BookList {
 
     public void addBook(String bookId)
     {
-        if(!(books.contains(bookId)) {
+        if(!(books.contains(bookId))) {
             books.add(bookId);
         }
-        }
     }
-
 }
+
 
 
 
