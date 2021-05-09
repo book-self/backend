@@ -29,21 +29,9 @@ public class BookListController
         return new ResponseEntity<>(bookList, HttpStatus.OK);
     }
 
-    @PostMapping("/newUser/booklists")
+    @GetMapping("/newBookLists")
     public ResponseEntity<BookList>generateBookList(){
        BookList newDNF = new BookList();
-       BookList newCurrent = new BookList();
-       BookList newRead = new BookList();
-       BookList newTBR = new BookList();
-
-       newDNF.setListType(BookListEnum.DNF);
-       newCurrent.setListType(BookListEnum.READING);
-       newRead.setListType(BookListEnum.READ);
-       newTBR.setListType(BookListEnum.TOREAD);
-       bookListRepository.save(newDNF);
-       bookListRepository.save(newCurrent);
-       bookListRepository.save(newRead);
-       bookListRepository.save(newTBR);
 
         return new ResponseEntity<>(newDNF, HttpStatus.OK);
     }
