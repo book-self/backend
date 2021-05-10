@@ -16,7 +16,9 @@ import javax.sql.DataSource;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 import static org.assertj.core.api.AssertionsForClassTypes.assertThat;
@@ -39,7 +41,7 @@ public class EqualsAndHashCodeTest {
     }
 
     @Test
-    void givenABookListEnum_withNullSafeSetShouldGenerateSQL(){
+    void givenABookListEnum_aBookListShouldBeSavedIntoARepository_whenRetrievedById_thenSameBookListShouldBeReturned(){
         final String id = "001";
         final BookList a = new BookList();
         a.setId(id);
@@ -57,7 +59,9 @@ public class EqualsAndHashCodeTest {
     void givenABookList_aBookIDShouldBeAbleToBeAddedIn_thenABookListShouldHaveOneBook(){
         final BookList a = new BookList();
         final String b = "aaa";
-        a.addBook(b);
+        Set<String> bookIds = new HashSet<String>();
+        bookIds.add(b);
+        a.setBooks(bookIds);
         assertThat(a.getBooks().size()==1).isTrue();
     }
 
