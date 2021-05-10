@@ -11,6 +11,8 @@ import xyz.bookself.users.domain.BookList;
 import xyz.bookself.users.domain.BookListEnum;
 import xyz.bookself.users.repository.BookListRepository;
 
+import java.util.Collection;
+import java.util.ArrayList;
 import java.util.UUID;
 
 @RestController
@@ -32,12 +34,28 @@ public class BookListController
     }
 
     @GetMapping("/newBookLists")
-    public ResponseEntity<BookList>generateBookList(){
+    public ResponseEntity<Collection<BookList>>generateBookList(){
+        Collection<BookList> newBookLists = new ArrayList<BookList>();
         BookList newDNF = new BookList();
         newDNF.setId(UUID.randomUUID().toString().replace("-", "").substring(0, 24));
         newDNF.setListType(BookListEnum.DNF);
         bookListRepository.save(newDNF);
-        return new ResponseEntity<>(newDNF, HttpStatus.OK);
+
+        BookList newCurrentlyReading = new BookList();
+        newCurrentlyReading.setId(UUID.randomUUID().toString().replace("-", "").substring(0, 24));
+        newCurrentlyReading.setListType(BookListEnum.READING);
+        bookListRepository.save(newCurrentlyReading);
+
+        BookList newRead = new BookList();
+        newRead.setId(UUID.randomUUID().toString().replace("-", "").substring(0, 24));
+        newRead.setListType(BookListEnum.READ);
+        bookListRepository.save(newRead);
+
+        newBookLists.add(newDNF);
+        newBookLists.add(newRead);
+        newBookLists.add(newCurrentlyReading);
+
+        return new ResponseEntity<>(newBookLists, HttpStatus.OK);
 
     }
 

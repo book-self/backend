@@ -31,10 +31,10 @@ public class UserController {
     }
 
     @RequestMapping(value = "/newUser", method = RequestMethod.GET)
-    public ResponseEntity<User>  createNewUser(){
+    public ResponseEntity<User>  createNewUser(@RequestParam String newUserEmail, @RequestParam String newUserName){
         User newUser = new User();
-        newUser.setUsername("dummyUserName");
-        newUser.setEmail(("dummy@dummy.com"));
+        newUser.setUsername(newUserName);
+        newUser.setEmail(newUserEmail);
         newUser.setPasswordHash(UUID.randomUUID().toString().replace("-", ""));
 
         LocalDate date = LocalDate.now();
