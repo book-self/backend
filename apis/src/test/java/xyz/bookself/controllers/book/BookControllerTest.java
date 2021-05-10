@@ -77,7 +77,7 @@ class BookControllerTest {
     }
 
     @Test
-    void givenThereAreEnoughBooks_whenGetRequestedToBooksAll_thenSixtyBooksAreReturned() throws Exception {
+    void givenThereAreEnoughBooks_whenGetRequestedToBooksAll_thenBooksAreReturned() throws Exception {
         final Collection<Book> sixtyBooks = IntStream.range(0, maxReturnedBooks).mapToObj(i -> {
             Book b = new Book();
             b.setId("_" + i);
