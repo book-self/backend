@@ -12,6 +12,7 @@ import xyz.bookself.users.domain.User;
 import xyz.bookself.users.repository.UserRepository;
 
 import java.util.Optional;
+import java.util.UUID;
 
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -34,15 +35,15 @@ public class UserControllerTest {
     void givenUserExists_whenGetRequestedWithIdOnPath_thenUserShouldBeReturned()
             throws Exception {
         final User userExists = new User();
-        final int validUserId = userExists.getId();
+        
+        userExists.setUsername("dummyUserName");
+        userExists.setEmail(("dummy@dummy.com"));
+        userExists.setPasswordHash(UUID.randomUUID().toString().replace("-", ""));
 
-        final String jsonContent = xyz.bookself.controllers.user.TestUtilities.toJsonString(userExists);
+        when(userRepository.findById(1)).thenReturn(Optional.of(userExists));
 
-        when(userRepository.findById(validUserId)).thenReturn(Optional.of(userExists));
-
-        mockMvc.perform(get(apiPrefix + "/" + validUserId))
-                .andExpect(status().isOk())
-                .andExpect(content().json(jsonContent));
+        mockMvc.perform(get(apiPrefix + "/" + 1))
+                .andExpect(status().isOk());
     }
 
     @Test
