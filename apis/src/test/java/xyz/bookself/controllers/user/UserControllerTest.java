@@ -33,13 +33,14 @@ public class UserControllerTest {
     @Test
     void givenUserExists_whenGetRequestedWithIdOnPath_thenUserShouldBeReturned()
             throws Exception {
-        int validUserId = 4;
         final User userExists = new User();
+        final int validUserId = userExists.getId();
+
         final String jsonContent = xyz.bookself.controllers.user.TestUtilities.toJsonString(userExists);
 
-        when(userRepository.findById(userExists.getId())).thenReturn(Optional.of(userExists));
+        when(userRepository.findById(validUserId)).thenReturn(Optional.of(userExists));
 
-        mockMvc.perform(get(apiPrefix + "/" + userExists.getId()))
+        mockMvc.perform(get(apiPrefix + "/" + validUserId))
                 .andExpect(status().isOk())
                 .andExpect(content().json(jsonContent));
     }
