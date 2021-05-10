@@ -25,7 +25,7 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable int id) {
+    public ResponseEntity<User> getUser(@PathVariable Integer id) {
         final User user = userRepository.findById(id).orElseThrow();
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
@@ -40,7 +40,6 @@ public class UserController {
         LocalDate date = LocalDate.now();
         newUser.setCreated(date);
         userRepository.save(newUser);
-
         return new ResponseEntity<>(newUser, HttpStatus.OK);
     }
 
