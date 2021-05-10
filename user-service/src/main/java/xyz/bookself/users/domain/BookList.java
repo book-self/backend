@@ -7,11 +7,21 @@ import org.hibernate.HibernateException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.sql.Types;
+
+import javax.persistence.CollectionTable;
+import javax.persistence.Column;
+import javax.persistence.ElementCollection;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.Table;
+
 import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
-
-import javax.persistence.*;
 
 @Data
 @NoArgsConstructor
