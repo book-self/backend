@@ -4,13 +4,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import xyz.bookself.books.domain.Book;
+
 import xyz.bookself.config.BookselfApiConfiguration;
 import xyz.bookself.users.domain.BookList;
 import xyz.bookself.users.domain.BookListEnum;
 import xyz.bookself.users.repository.BookListRepository;
-import xyz.bookself.users.repository.UserRepository;
 
+import java.util.Collection;
 import java.util.UUID;
 
 @RestController
@@ -26,9 +26,9 @@ public class BookListController
     }
 
     @GetMapping("/booklist/{id}")
-    public ResponseEntity<BookList> getBookList(@PathVariable String bookListId) {
-        final BookList bookList = bookListRepository.findById(bookListId).orElseThrow();
-        return new ResponseEntity<>(bookList, HttpStatus.OK);
+    public ResponseEntity<Collection<String>> getBookList(@PathVariable String bookListId) {
+        final Collection<String> bookIds = bookListRepository.findAllBookIdInList(bookListId, apiConfiguration.getMaxReturnedBooks());
+        return new ResponseEntity<>(bookIds, HttpStatus.OK);
     }
 
     @GetMapping("/newBookLists")
@@ -36,6 +36,7 @@ public class BookListController
        BookList newDNF = new BookList();
        newDNF.setId(UUID.randomUUID().toString().replace("-", "").substring(0, 24));
        newDNF.setListType(BookListEnum.DNF);
+
        return new ResponseEntity<>(newDNF, HttpStatus.OK);
 
     }
