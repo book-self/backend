@@ -53,7 +53,7 @@ class AuthorControllerTest {
     }
 
     @Test
-    void givenThereAreEnoughAuthors_whenGetRequestedToAuthorsAll_thenAuthorsShouldBeReturned()
+    void givenThereAreEnoughAuthors_whenGetRequestedToAuthorsAll_thenNAuthorsShouldBeReturned()
             throws Exception {
 
         final Collection<Author> authors = IntStream.range(0, maxReturnedAuthors)
@@ -65,7 +65,7 @@ class AuthorControllerTest {
 
         when(authorRepository.findAnyAuthors(maxReturnedAuthors)).thenReturn(authors);
 
-        mockMvc.perform(get(apiPrefix + "/all"))
+        mockMvc.perform(get(apiPrefix + "/any"))
                 .andExpect(status().isOk())
                 .andExpect(content().json(TestUtilities.toJsonString(authors)));
     }

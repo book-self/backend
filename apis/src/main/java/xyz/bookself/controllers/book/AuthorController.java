@@ -32,7 +32,7 @@ public class AuthorController {
         return new ResponseEntity<>(author, HttpStatus.OK);
     }
 
-    @GetMapping("/all")
+    @GetMapping("/any")
     public ResponseEntity<Collection<Author>> getAuthors() {
         final Collection<Author> authors = authorRepository.findAnyAuthors(apiConfiguration.getMaxReturnedAuthors());
         return new ResponseEntity<>(authors, HttpStatus.OK);
