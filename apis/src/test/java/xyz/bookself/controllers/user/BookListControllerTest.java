@@ -42,7 +42,7 @@ public class BookListControllerTest {
     }
 
     @Test
-    void givenANewUserIsCreated_whenRoutedAtLeastOneBookListIsCreated_thenBookListIsReturned()
+    void givenANewUserIsCreated_whenRoutedAtLeastThreeBookListIsCreated_thenBookListIsReturned()
         throws Exception{
         mockMvc.perform(get(apiPrefix + "/" + "newBookLists"))
                 .andExpect(status().isOk());
