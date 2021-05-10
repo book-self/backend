@@ -1,6 +1,7 @@
 package xyz.bookself.users.domain;
 
 import lombok.Data;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.HibernateException;
 
@@ -18,6 +19,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.Table;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 import java.util.UUID;
 
@@ -47,12 +49,20 @@ public class BookList {
             st.setNull(index, Types.VARCHAR);
         }
         else {
-//            previously used setString, but this causes postgresql to bark about incompatible types.
-//           now using setObject passing in the java type for the postgres enum object
-//            st.setString(index,((Enum) value).name());
             st.setObject(index,((Enum) value), Types.OTHER);
         }
+    }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        BookList bookList = (BookList) o;
+        return id.equals(bookList.id);
+    }
 
+    @Override
+    public int hashCode() {
+        return Objects.hash(id);
     }
 }
 
