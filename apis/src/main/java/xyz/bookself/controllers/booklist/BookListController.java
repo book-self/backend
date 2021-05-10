@@ -25,8 +25,8 @@ public class BookListController
         this.apiConfiguration = configuration;
     }
 
-    @GetMapping("/booklist/{id}")
-    public ResponseEntity<Collection<String>> getBookList(@PathVariable String bookListId) {
+    @GetMapping("/booklist")
+    public ResponseEntity<Collection<String>> getBookList(@RequestParam(value = "listID") String bookListId) {
         final Collection<String> bookIds = bookListRepository.findAllBookIdInList(bookListId, apiConfiguration.getMaxReturnedBooks());
         return new ResponseEntity<>(bookIds, HttpStatus.OK);
     }
