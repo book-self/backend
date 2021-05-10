@@ -11,6 +11,8 @@ import xyz.bookself.users.domain.BookListEnum;
 import xyz.bookself.users.repository.BookListRepository;
 import xyz.bookself.users.repository.UserRepository;
 
+import java.util.UUID;
+
 @RestController
 public class BookListController
 {
@@ -32,8 +34,10 @@ public class BookListController
     @GetMapping("/newBookLists")
     public ResponseEntity<BookList>generateBookList(){
        BookList newDNF = new BookList();
+       newDNF.setId(UUID.randomUUID().toString().replace("-", "").substring(0, 24));
+       newDNF.setListType(BookListEnum.DNF);
+       return new ResponseEntity<>(newDNF, HttpStatus.OK);
 
-        return new ResponseEntity<>(newDNF, HttpStatus.OK);
     }
     @PostMapping("/addBook")
     public ResponseEntity<BookList>addBookToList(@RequestParam String bookListId, @RequestParam String bookId)
