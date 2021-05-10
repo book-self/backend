@@ -50,8 +50,9 @@ public class UserControllerTest {
     void givenUserCreated_UserShouldBeReturned()
             throws Exception
     {
-        final String newUser = "newUser";
-        mockMvc.perform(get(apiPrefix + "/" + newUser))
+        final String newUserEmail = "newUser@newNew.com";
+        final String newUserName = "I am new";
+        mockMvc.perform(get(apiPrefix + "/newUser/?newUserEmail=" + newUserEmail + "&newUserName=" + newUserName))
                 .andExpect(status().isOk());
     }
 }
