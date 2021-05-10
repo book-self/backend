@@ -3,11 +3,7 @@ package xyz.bookself.controllers.user;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import xyz.bookself.books.domain.Book;
 import xyz.bookself.config.BookselfApiConfiguration;
@@ -39,7 +35,7 @@ public class UserController {
         return new ResponseEntity<>(user, HttpStatus.OK);
     }
 
-    @GetMapping("/newUser")
+    @RequestMapping(value = "/newUser", method = RequestMethod.GET)
     public String createNewUser(){
         User newUser = new User();
         newUser.setUsername("dummyUserName");
