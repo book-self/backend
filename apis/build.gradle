@@ -58,6 +58,9 @@ check.dependsOn jacocoTestCoverageVerification
 
 test {
 	useJUnitPlatform()
+	beforeTest { descriptor ->
+		logger.lifecycle("Running test: ${descriptor}")
+	}
 }
 
 

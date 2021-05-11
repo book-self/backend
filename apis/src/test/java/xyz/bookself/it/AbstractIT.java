@@ -1,4 +1,4 @@
-package xyz.bookself.integration;
+package xyz.bookself.it;
 
 import org.flywaydb.core.Flyway;
 import org.springframework.beans.factory.annotation.Autowired;
