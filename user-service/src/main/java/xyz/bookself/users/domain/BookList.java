@@ -28,6 +28,7 @@ import java.util.Set;
 public class BookList {
     @Id
     private String id;
+    private Integer userId;
     @Enumerated(EnumType.STRING)
     private BookListEnum listType;
     @ElementCollection(fetch = FetchType.LAZY)
