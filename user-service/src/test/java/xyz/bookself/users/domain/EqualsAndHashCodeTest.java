@@ -45,7 +45,7 @@ public class EqualsAndHashCodeTest {
         final String id = "001";
         final BookList a = new BookList();
         a.setId(id);
-        a.setListType(BookListEnum.DNF);
+        a.setListType(BookListEnum.TO_READ);
 
         when(bookListRepository.save(a)).thenReturn(null);
         bookListRepository.save(a);
