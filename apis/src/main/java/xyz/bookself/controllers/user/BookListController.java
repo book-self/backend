@@ -5,16 +5,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import xyz.bookself.users.domain.BookList;
 import xyz.bookself.users.domain.BookListEnum;
 import xyz.bookself.users.repository.BookListRepository;
 
+import java.util.Collection;
 import java.util.Set;
 import java.util.UUID;
 
@@ -32,6 +28,14 @@ public class BookListController {
     public ResponseEntity<BookList> getBookList(@PathVariable String id) {
         final BookList booklist = bookListRepository.findById(id).orElseThrow();
         return new ResponseEntity<>(booklist, HttpStatus.OK);
+    }
+
+    @GetMapping("/get-user-book-lists")
+    public ResponseEntity<Collection<BookList>>getUserBookList(@RequestParam Integer userId)
+    {
+        final Collection<BookList> userBookListId = bookListRepository.findUserBookLists(userId);
+
+        return new ResponseEntity<>(userBookListId, HttpStatus.OK);
     }
 
     @PostMapping("/new-book-lists")
