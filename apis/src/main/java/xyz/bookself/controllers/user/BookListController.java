@@ -6,6 +6,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import xyz.bookself.books.domain.Book;
 import xyz.bookself.users.domain.BookList;
 import xyz.bookself.users.domain.BookListEnum;
 import xyz.bookself.users.repository.BookListRepository;
@@ -38,13 +39,19 @@ public class BookListController {
         return new ResponseEntity<>(userBookListId, HttpStatus.OK);
     }
 
-    @PostMapping("/new-book-lists")
-    public ResponseEntity<BookList> generateBookList() {
-        final BookList newDNF = new BookList();
-        newDNF.setId(UUID.randomUUID().toString().replace("-", "").substring(0, 24));
-        newDNF.setListType(BookListEnum.DNF);
-        bookListRepository.save(newDNF);
-        return new ResponseEntity<>(newDNF, HttpStatus.OK);
+    @PostMapping(value = "/new-book-lists", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    public ResponseEntity<BookList> generateBookList(@RequestBody UserIdDTO userIdDTO) {
+        Collection<BookList> userBookLists = bookListRepository.findUserBookLists(userIdDTO.getUserId());
+        if(userBookLists == null) {
+            final BookList newDNF = new BookList();
+            newDNF.setId(UUID.randomUUID().toString().replace("-", "").substring(0, 24));
+            newDNF.setListType(BookListEnum.DNF);
+            newDNF.setUserId(userIdDTO.getUserId());
+            bookListRepository.save(newDNF);
+            return new ResponseEntity<>(newDNF, HttpStatus.OK);
+        }
+        return new ResponseEntity<>(null, HttpStatus.CREATED);
+
     }
 
     @PostMapping(value = "/add-book-to-list", consumes = {MediaType.APPLICATION_JSON_VALUE})
@@ -57,6 +64,17 @@ public class BookListController {
     }
 }
 
+class UserIdDTO{
+    private Integer userId;
+
+    public Integer getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
+    }
+}
 class BookIdListIdDTO {
     private String bookId;
     private String listId;
