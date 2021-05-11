@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RestController;
 import xyz.bookself.users.domain.User;
 import xyz.bookself.users.repository.UserRepository;
 
+import java.time.LocalDate;
+
 @RestController
 @RequestMapping("/v1/users")
 @Slf4j
@@ -34,6 +36,7 @@ public class UserController {
 
     @PostMapping(value = "/new-user", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<User>createNewUser(@RequestBody User newUser){
+        newUser.setCreated(LocalDate.now());
         return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
     }
 }

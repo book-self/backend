@@ -35,8 +35,8 @@ public class BookListController {
     }
 
     @PostMapping("/new-book-lists")
-    public ResponseEntity<BookList>generateBookList(){
-        BookList newDNF = new BookList();
+    public ResponseEntity<BookList> generateBookList() {
+        final BookList newDNF = new BookList();
         newDNF.setId(UUID.randomUUID().toString().replace("-", "").substring(0, 24));
         newDNF.setListType(BookListEnum.DNF);
         bookListRepository.save(newDNF);
@@ -44,10 +44,9 @@ public class BookListController {
     }
 
     @PostMapping(value = "/add-book-to-list", consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<BookList>addBookToList(@RequestBody BookIdListIdDTO bookIdListIdDTO)
-    {
-        BookList foundBookList = bookListRepository.findById(bookIdListIdDTO.getListId()).orElseThrow();
-        Set<String> booksInList = foundBookList.getBooks();
+    public ResponseEntity<BookList> addBookToList(@RequestBody BookIdListIdDTO bookIdListIdDTO) {
+        final BookList foundBookList = bookListRepository.findById(bookIdListIdDTO.getListId()).orElseThrow();
+        final Set<String> booksInList = foundBookList.getBooks();
         booksInList.add(bookIdListIdDTO.getBookId());
         foundBookList.setBooks(booksInList);
         return new ResponseEntity<>(foundBookList, HttpStatus.OK);
