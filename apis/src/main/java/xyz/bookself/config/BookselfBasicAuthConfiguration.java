@@ -43,6 +43,7 @@ public class BookselfBasicAuthConfiguration extends WebSecurityConfigurerAdapter
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers("/ping").permitAll() // Allow calls to /ping
+                .antMatchers("/actuator/**").permitAll() // Allow calls to all /actuator endpoints
                 .anyRequest().authenticated() // Everything else needs auth -- this'll probably need to be tweaked as we go
                 .and()
                 .csrf().disable()
