@@ -35,6 +35,7 @@ dependencies {
 	testImplementation testContainers
 	testImplementation testContainersPostgres
 	testImplementation testContainersJupiter
+	testImplementation springSecurityTest
 	testRuntimeOnly h2Database
 }
 
