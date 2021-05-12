@@ -81,7 +81,13 @@ public class BookListControllerTest {
 
         final UserIdDTO userIdDTO = new UserIdDTO();
         userIdDTO.setUserId(1);
-        when((bookListRepository.findUserBookLists(userIdDTO.getUserId()))).thenReturn(null);
+        final Collection<BookList> oneBookList = IntStream.range(0, 0).mapToObj(i -> {
+            BookList b = new BookList();
+            b.setId(Integer.toHexString(i));
+            b.setUserId(1);
+            return b;
+        }).collect(Collectors.toSet());
+        when((bookListRepository.findUserBookLists(userIdDTO.getUserId()))).thenReturn(oneBookList);
 
         final BookList newDNF = new BookList();
         newDNF.setId(UUID.randomUUID().toString().replace("-", "").substring(0, 24));

@@ -40,17 +40,18 @@ public class BookListController {
     }
 
     @PostMapping(value = "/new-book-lists", consumes = {MediaType.APPLICATION_JSON_VALUE})
-    public ResponseEntity<BookList> generateBookList(@RequestBody UserIdDTO userIdDTO) {
+    public ResponseEntity<Collection<BookList>> generateBookList(@RequestBody UserIdDTO userIdDTO) {
         Collection<BookList> userBookLists = bookListRepository.findUserBookLists(userIdDTO.getUserId());
-        if(userBookLists == null) {
+        if(userBookLists.size() == 0) {
             final BookList newDNF = new BookList();
             newDNF.setId(UUID.randomUUID().toString().replace("-", "").substring(0, 24));
             newDNF.setListType(BookListEnum.DNF);
             newDNF.setUserId(userIdDTO.getUserId());
             bookListRepository.save(newDNF);
-            return new ResponseEntity<>(newDNF, HttpStatus.OK);
+            userBookLists.add(newDNF);
+            return new ResponseEntity<>(userBookLists, HttpStatus.OK);
         }
-        return new ResponseEntity<>(null, HttpStatus.CREATED);
+        return new ResponseEntity<>(userBookLists, HttpStatus.CREATED);
 
     }
 

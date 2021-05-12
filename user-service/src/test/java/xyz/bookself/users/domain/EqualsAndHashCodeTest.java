@@ -36,7 +36,7 @@ public class EqualsAndHashCodeTest {
         final BookList a = new BookList();
         a.setId(id);
         final BookList b = new BookList();
-        b.setId(id);
+        b.setId(id);s
         assertThat(a.equals(b)).isTrue();
     }
 
@@ -45,7 +45,8 @@ public class EqualsAndHashCodeTest {
         final String id = "001";
         final BookList a = new BookList();
         a.setId(id);
-        a.setListType(BookListEnum.TO_READ);
+        a.setListType(BookListEnum.DNF);
+
 
         when(bookListRepository.save(a)).thenReturn(null);
         bookListRepository.save(a);
