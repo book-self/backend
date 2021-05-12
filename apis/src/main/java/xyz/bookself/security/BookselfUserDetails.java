@@ -7,6 +7,9 @@ import xyz.bookself.users.domain.User;
 import java.util.Collection;
 import java.util.Set;
 
+/**
+ * User details object used by Spring Security
+ */
 public class BookselfUserDetails implements UserDetails {
 
     private final String username;
@@ -16,6 +19,7 @@ public class BookselfUserDetails implements UserDetails {
     public BookselfUserDetails(User user) {
         this.username = user.getUsername();
         this.passwordHash = user.getPasswordHash();
+        // Random crap here... can tweak later
         this.grantedAuthority = Set.of((GrantedAuthority) () -> "ALL_THE_AUTHORITY");
     }
 

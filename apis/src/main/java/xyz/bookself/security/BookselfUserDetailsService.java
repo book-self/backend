@@ -7,6 +7,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 import xyz.bookself.users.repository.UserRepository;
 
+/**
+ * Used by Spring Security to interface with {@link UserRepository} to grab the user object from the database when authenticating.
+ */
 @Service
 public class BookselfUserDetailsService implements UserDetailsService {
 

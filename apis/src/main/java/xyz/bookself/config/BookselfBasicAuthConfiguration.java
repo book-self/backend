@@ -11,6 +11,12 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import xyz.bookself.security.BookselfUserDetailsService;
 
+/**
+ * Sets up the API to require auth on all endpoints but /pint (can't do auth here due to load balancer health checking)
+ *
+ * Uses the {@link xyz.bookself.security.BookselfUserDetailsService} to check the database for a user and
+ * {@link BCryptPasswordEncoder} to deal with comparing the plain text password to the hash we have in the DB.
+ */
 @Configuration
 @EnableWebSecurity
 public class BookselfBasicAuthConfiguration extends WebSecurityConfigurerAdapter {
@@ -31,8 +37,8 @@ public class BookselfBasicAuthConfiguration extends WebSecurityConfigurerAdapter
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/ping").permitAll()
-                .anyRequest().authenticated()
+                .antMatchers("/ping").permitAll() // Allow calls to /ping
+                .anyRequest().authenticated() // Everything else needs auth -- this'll probably need to be tweaked as we go
                 .and()
                 .httpBasic();
     }
