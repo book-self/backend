@@ -36,7 +36,7 @@ public class EqualsAndHashCodeTest {
         final BookList a = new BookList();
         a.setId(id);
         final BookList b = new BookList();
-        b.setId(id);s
+        b.setId(id);
         assertThat(a.equals(b)).isTrue();
     }
 
