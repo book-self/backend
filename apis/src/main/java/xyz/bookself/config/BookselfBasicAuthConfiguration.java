@@ -9,10 +9,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import xyz.bookself.security.BookselfUserDetailsService;
 
 @Configuration
 @EnableWebSecurity
 public class BookselfBasicAuthConfiguration extends WebSecurityConfigurerAdapter {
+
+    @Autowired
+    private BookselfUserDetailsService userDetailsService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -21,15 +25,14 @@ public class BookselfBasicAuthConfiguration extends WebSecurityConfigurerAdapter
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
-        auth.inMemoryAuthentication()
-                .withUser("user1").password("password1234").roles("USER");
+        auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .anyRequest()
-                .authenticated()
+                .antMatchers("/ping").permitAll()
+                .anyRequest().authenticated()
                 .and()
                 .httpBasic();
     }
