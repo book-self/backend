@@ -25,6 +25,7 @@ dependencies {
 	implementation springBootStarterWeb
 	implementation springBootStarterActuator
 	implementation springBootStarterDataJpa
+	implementation springBootStarterSecurity
 	implementation flywayCore
 	implementation postgresql
 
