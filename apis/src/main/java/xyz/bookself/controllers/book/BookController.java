@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import xyz.bookself.books.domain.Book;
 import xyz.bookself.books.domain.BookRank;
+import xyz.bookself.books.domain.BookWithRank;
 import xyz.bookself.books.repository.BookRepository;
 import xyz.bookself.config.BookselfApiConfiguration;
 
@@ -54,16 +55,6 @@ public class BookController {
     public ResponseEntity<Collection<Book>> getBooks() {
         final Collection<Book> books = bookRepository.findAnyBooks(apiConfiguration.getMaxReturnedBooks());
         return new ResponseEntity<>(books, HttpStatus.OK);
-    }
-
-    // a Book with its rank attached
-    class BookWithRank {
-        public Book book;
-        public Double rank;
-
-        public BookWithRank(Book book, Double rank) {
-            this.book = book; this.rank = rank;
-        }
     }
 
     @GetMapping("/search")
