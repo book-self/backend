@@ -12,6 +12,7 @@ import xyz.bookself.books.domain.Book;
 import xyz.bookself.books.domain.BookRank;
 import xyz.bookself.books.domain.BookWithRank;
 import xyz.bookself.books.repository.BookRepository;
+import java.util.concurrent.ThreadLocalRandom;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -94,7 +95,9 @@ class BookControllerTest {
         final List<BookRank> sixtyBooksAsBookRank = IntStream.range(0, maxReturnedBooks)
             .mapToObj(i -> new BookRank() {
                 @Override
-                public Double getRank() { return 1.0; }
+                public Double getRank() {
+                    return ThreadLocalRandom.current().nextInt(0, 2) == 0 ?  0.0 : 1.0;
+                }
                 @Override
                 public String getId() { return "1"; }
             })
