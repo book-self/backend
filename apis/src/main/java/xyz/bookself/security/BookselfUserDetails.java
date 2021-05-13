@@ -25,6 +25,13 @@ public class BookselfUserDetails implements UserDetails {
         this.grantedAuthority = Set.of((GrantedAuthority) () -> "ALL_THE_AUTHORITY");
     }
 
+    public BookselfUserDetails(Integer id) {
+        this.id = id;
+        this.username = null;
+        this.passwordHash = null;
+        this.grantedAuthority = Set.of((GrantedAuthority) () -> "ALL_THE_AUTHORITY");
+    }
+
     public Integer getId() {
         return id;
     }

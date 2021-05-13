@@ -5,16 +5,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import xyz.bookself.security.BookselfUserDetails;
 import xyz.bookself.users.domain.User;
 import xyz.bookself.users.repository.UserRepository;
 
 import java.time.LocalDate;
-import java.util.Optional;
 
 @RestController
 @RequestMapping("/v1/users")
@@ -29,21 +26,15 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<User> getUser(@PathVariable Integer id) {
-        // Get the currently logged in user
-        final var userDetails = Optional.ofNullable(SecurityContextHolder.getContext())
-                .map(SecurityContext::getAuthentication)
-                .map(Authentication::getPrincipal)
-                .filter(principal -> principal instanceof BookselfUserDetails)
-                .map(BookselfUserDetails.class::cast);
-
+    public ResponseEntity<User> getUser(@PathVariable Integer id,
+                                        @AuthenticationPrincipal BookselfUserDetails userDetails) {
         // If nobody is logged in, UNAUTHORIZED
-        if (userDetails.isEmpty()) {
+        if (userDetails == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
         // If somebody is logged in but is trying to access somebody else's profile, FORBIDDEN
-        if (!userDetails.get().getId().equals(id)) {
+        if (!userDetails.getId().equals(id)) {
             return new ResponseEntity<>(HttpStatus.FORBIDDEN);
         }
 
