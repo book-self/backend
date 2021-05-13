@@ -39,14 +39,14 @@ public class UserController {
         User newUser = new User();
         newUser.setUsername(newUserDTO.getUsername());
         newUser.setEmail(newUserDTO.getEmail());
-        newUser.setPasswordHash(newUser.getPasswordHash());
+        newUser.setPasswordHash(newUserDTO.getPasswordHash());
         newUser.setCreated(LocalDate.now());
         return new ResponseEntity<>(userRepository.save(newUser), HttpStatus.OK);
     }
 }
 
 class NewUserDTO
-{
+{ 
     private String username;
     private String passwordHash;
     private String email;
