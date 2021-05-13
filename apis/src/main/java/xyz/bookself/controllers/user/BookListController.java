@@ -59,23 +59,16 @@ public class BookListController {
             bookListRepository.save(newDNF);
             userBookLists.add(newDNF);
 
-            final BookList toRead = new BookList();
-            toRead.setId(UUID.randomUUID().toString().replace("-", "").substring(0, 24));
-            toRead.setListType(BookListEnum.TO_READ);
-            toRead.setUserId(userIdDTO.getUserId());
-            bookListRepository.save(toRead);
-            userBookLists.add(toRead);
-
             final BookList read = new BookList();
             read.setId(UUID.randomUUID().toString().replace("-", "").substring(0, 24));
-            read.setListType(BookListEnum.TO_READ);
+            read.setListType(BookListEnum.READ);
             read.setUserId(userIdDTO.getUserId());
             bookListRepository.save(read);
             userBookLists.add(read);
 
             final BookList current = new BookList();
             current.setId(UUID.randomUUID().toString().replace("-", "").substring(0, 24));
-            current.setListType(BookListEnum.TO_READ);
+            current.setListType(BookListEnum.READING);
             current.setUserId(userIdDTO.getUserId());
             bookListRepository.save(current);
             userBookLists.add(current);
