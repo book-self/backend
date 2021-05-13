@@ -40,7 +40,7 @@ public class BookselfBasicAuthConfiguration extends WebSecurityConfigurerAdapter
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
-                .antMatchers("/**").permitAll() // Allow everything except above
+                .antMatchers("/**").permitAll() // Allow everything -- override at the Controller level on a method-by-method basis
                 .and()
                 .csrf().disable()
                 .httpBasic();
