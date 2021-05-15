@@ -74,8 +74,7 @@ public class UserController {
         return new ResponseEntity<>(newUser, HttpStatus.OK);
     }
 
-    private void createNewBookLists(User newUser)
-    {
+    private void createNewBookLists(User newUser) {
         final BookList newDNF = new BookList();
         newDNF.setId(createUUID());
         newDNF.setListType(BookListEnum.DNF);
@@ -95,14 +94,12 @@ public class UserController {
         bookListRepository.save(current);
     }
 
-    private String createUUID()
-    {
+    private String createUUID() {
         return UUID.randomUUID().toString().replace("-", "").substring(0, 24);
     }
 }
 
-class NewUserDTO
-{ 
+class NewUserDTO { 
     private String username;
     private String passwordHash;
     private String email;
