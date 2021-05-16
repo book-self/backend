@@ -10,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
-
 import xyz.bookself.users.domain.BookList;
 import xyz.bookself.users.domain.BookListEnum;
 import xyz.bookself.users.repository.BookListRepository;
@@ -23,11 +22,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -54,24 +51,6 @@ public class BookListControllerTest {
 
         when(bookListRepository.findById(validBookListId)).thenReturn(Optional.of(bookListThatExistsInDatabase));
         mockMvc.perform(get(apiPrefix + "/" + validBookListId))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void givenUserId_userListsShouldBeReturned()
-            throws Exception
-    {
-        final Integer givenUserId = 99;
-        final Collection<BookList> fourBookLists = IntStream.range(0, 4).mapToObj(i -> {
-            BookList b = new BookList();
-            b.setId(Integer.toHexString(i));
-            b.setUserId(givenUserId);
-            return b;
-        }).collect(Collectors.toSet());
-
-        when(bookListRepository.findUserBookLists(givenUserId)).thenReturn(fourBookLists);
-
-        mockMvc.perform(get(apiPrefix + "/get-user-book-lists?userId="+givenUserId))
                 .andExpect(status().isOk());
     }
 
@@ -105,5 +84,4 @@ public class BookListControllerTest {
 
 
     }
-
 }

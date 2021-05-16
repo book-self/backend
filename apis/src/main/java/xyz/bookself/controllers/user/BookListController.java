@@ -5,16 +5,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import xyz.bookself.books.domain.Book;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
 import xyz.bookself.config.BookselfApiConfiguration;
 import xyz.bookself.users.domain.BookList;
-import xyz.bookself.users.domain.BookListEnum;
 import xyz.bookself.users.repository.BookListRepository;
 
 import java.util.Collection;
+import java.util.Objects;
 import java.util.Set;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/v1/book-lists")
@@ -34,12 +39,15 @@ public class BookListController {
         return new ResponseEntity<>(booklist, HttpStatus.OK);
     }
 
+    // Rewritten below as endpoint /v1/book-lists/{id}/books
     @GetMapping("/get-books-in-list")
     public ResponseEntity<Collection<String>>getAllBooksInList(@RequestParam String bookListId)
     {
         final Collection<String>booksInList = bookListRepository.findAllBookIdInList(bookListId,apiConfiguration.getMaxReturnedBooks());
         return new ResponseEntity<>(booksInList, HttpStatus.OK);
     }
+
+    // Moved to UserController as endpoint /v1/users/{id}/lists
     @GetMapping("/get-user-book-lists")
     public ResponseEntity<Collection<BookList>>getUserBookList(@RequestParam Integer userId)
     {
@@ -48,7 +56,8 @@ public class BookListController {
         return new ResponseEntity<>(userBookListId, HttpStatus.OK);
     }
 
-    @PostMapping(value = "/add-book-to-list", consumes = {MediaType.APPLICATION_JSON_VALUE})
+    // Replaced below by the PUT endpoint /v1/book-lists/{id}/update
+    @PostMapping(value = "/add-book-to-list", consumes = { MediaType.APPLICATION_JSON_VALUE })
     public ResponseEntity<BookList> addBookToList(@RequestBody BookIdListIdDTO bookIdListIdDTO) {
         final BookList foundBookList = bookListRepository.findById(bookIdListIdDTO.getListId()).orElseThrow();
         final Set<String> booksInList = foundBookList.getBooks();
@@ -58,16 +67,62 @@ public class BookListController {
         bookListRepository.save(foundBookList);
         return new ResponseEntity<>(foundBookList, HttpStatus.OK);
     }
-}
 
-class UserIdDTO{
-    private Integer userId;
-
-    public Integer getUserId() {
-        return userId;
+    /**
+     * Get books in a book list (shelf)
+     * @param bookListId id of shelf
+     * @return list of books in shelf
+     */
+    @GetMapping("/{id}/books")
+    public ResponseEntity<Collection<String>> getBooks(@PathVariable("id") String bookListId) {
+        final Collection<String>booksInList = bookListRepository.findAllBookIdInList(bookListId, apiConfiguration.getMaxReturnedBooks());
+        return new ResponseEntity<>(booksInList, HttpStatus.OK);
     }
 
-    public void setUserId(Integer userId) {
-        this.userId = userId;
+    /**
+     * Update a book list (shelf).
+     *  - Rename shelf
+     *  - Add books
+     *  - Remove books
+     * Check if fields are not null before updating shelf.
+     * Unrecognized fields are ignored.
+     * @param shelfDto JSON of the format:
+     *      {
+     *          "newListName": "New Name",
+     *          "booksToBeAdded": [ "book-id-1", "book-id-2" ],
+     *          "booksToBeRemoved": [ "book-id-3", "book-id-4" ]
+     *      }
+     * @param id the shelf id
+     * The correct request method for updating is PUT
+     */
+    @PutMapping(value = "/{id}/update", consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<BookList> renameShelf(@PathVariable String id, @RequestBody ShelfDto shelfDto) {
+
+        final String newListName = shelfDto.getNewListName();
+        final Set<String> booksToBeAdded = shelfDto.getBooksToBeAdded();
+        final Set<String> booksToBeRemoved = shelfDto.getBooksToBeRemoved();
+
+        final BookList shelf = bookListRepository.findById(id).orElseThrow();
+        boolean updated = false;
+
+        if(Objects.nonNull(newListName)) {
+            shelf.setBookListName(newListName);
+            updated = true;
+        }
+
+        if(Objects.nonNull(booksToBeAdded) && !booksToBeAdded.isEmpty()) {
+            final Set<String> booksInList = shelf.getBooks();
+            booksInList.addAll(booksToBeAdded);
+            updated = true;
+        }
+
+        if(Objects.nonNull(booksToBeRemoved) && !booksToBeRemoved.isEmpty()) {
+            final Set<String> booksInList = shelf.getBooks();
+            booksInList.removeAll(booksToBeRemoved);
+            updated = true;
+        }
+
+        return new ResponseEntity<>((updated) ? bookListRepository.save(shelf) : shelf, HttpStatus.OK);
     }
 }
+
