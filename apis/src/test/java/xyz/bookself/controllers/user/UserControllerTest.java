@@ -116,6 +116,22 @@ public class UserControllerTest {
         mockMvc.perform(get(apiPrefix + "/" + givenUserId + "/book-lists"))
                 .andExpect(status().isOk());
     }
+
+    @Test
+    void givenUserId_userListsShouldBeReturned() throws Exception {
+        final Integer givenUserId = 99;
+        final Collection<BookList> fourBookLists = IntStream.range(0, 4).mapToObj(i -> {
+            BookList b = new BookList();
+            b.setId(Integer.toHexString(i));
+            b.setUserId(givenUserId);
+            return b;
+        }).collect(Collectors.toSet());
+
+        when(bookListRepository.findUserBookLists(givenUserId)).thenReturn(fourBookLists);
+
+        mockMvc.perform(get(apiPrefix + "/" + givenUserId + "/book-lists"))
+                .andExpect(status().isOk());
+    }
 }
 
 
