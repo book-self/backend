@@ -7,11 +7,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import xyz.bookself.config.BookselfApiConfiguration;
 import xyz.bookself.users.domain.BookList;
@@ -25,8 +23,10 @@ import java.util.Set;
 @RequestMapping("/v1/book-lists")
 @Slf4j
 public class BookListController {
+
     private final BookselfApiConfiguration apiConfiguration;
     private final BookListRepository bookListRepository;
+
     @Autowired
     public BookListController(BookselfApiConfiguration configuration, BookListRepository repository) {
         this.apiConfiguration = configuration;
@@ -37,35 +37,6 @@ public class BookListController {
     public ResponseEntity<BookList> getBookList(@PathVariable String id) {
         final BookList booklist = bookListRepository.findById(id).orElseThrow();
         return new ResponseEntity<>(booklist, HttpStatus.OK);
-    }
-
-    // Rewritten below as endpoint /v1/book-lists/{id}/books
-    @GetMapping("/get-books-in-list")
-    public ResponseEntity<Collection<String>>getAllBooksInList(@RequestParam String bookListId)
-    {
-        final Collection<String>booksInList = bookListRepository.findAllBookIdInList(bookListId,apiConfiguration.getMaxReturnedBooks());
-        return new ResponseEntity<>(booksInList, HttpStatus.OK);
-    }
-
-    // Moved to UserController as endpoint /v1/users/{id}/lists
-    @GetMapping("/get-user-book-lists")
-    public ResponseEntity<Collection<BookList>>getUserBookList(@RequestParam Integer userId)
-    {
-        final Collection<BookList> userBookListId = bookListRepository.findUserBookLists(userId);
-
-        return new ResponseEntity<>(userBookListId, HttpStatus.OK);
-    }
-
-    // Replaced below by the PUT endpoint /v1/book-lists/{id}/update
-    @PostMapping(value = "/add-book-to-list", consumes = { MediaType.APPLICATION_JSON_VALUE })
-    public ResponseEntity<BookList> addBookToList(@RequestBody BookIdListIdDTO bookIdListIdDTO) {
-        final BookList foundBookList = bookListRepository.findById(bookIdListIdDTO.getListId()).orElseThrow();
-        final Set<String> booksInList = foundBookList.getBooks();
-        booksInList.add(bookIdListIdDTO.getBookId());
-        foundBookList.setBooks(booksInList);
-
-        bookListRepository.save(foundBookList);
-        return new ResponseEntity<>(foundBookList, HttpStatus.OK);
     }
 
     /**
