@@ -9,10 +9,14 @@ import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
+import xyz.bookself.controllers.TestUtilities;
 import xyz.bookself.users.domain.BookList;
 import xyz.bookself.users.repository.BookListRepository;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.hamcrest.Matchers.containsString;
 import static org.mockito.Mockito.when;
@@ -57,16 +61,47 @@ class BookListControllerTest {
         originalBookList.setId(bookListId);
         originalBookList.setBookListName(originalListName);
 
-        final BookList updatedBookList = new BookList();
-        updatedBookList.setId(bookListId);
-        updatedBookList.setBookListName(newListName);
+        final BookList expectedBookList = new BookList();
+        expectedBookList.setId(bookListId);
+        expectedBookList.setBookListName(newListName);
 
         final ShelfDto shelfDto = new ShelfDto();
         shelfDto.setNewListName(newListName);
+        final String jsonRequestBody = TestUtilities.toJsonString(shelfDto);
 
         when(bookListRepository.findById(bookListId)).thenReturn(Optional.of(originalBookList));
-        when(bookListRepository.save(updatedBookList)).thenReturn(updatedBookList);
+        when(bookListRepository.save(expectedBookList)).thenReturn(expectedBookList);
 
+        final MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .put(apiPrefix + "/" + bookListId + "/update")
+                .accept(MediaType.APPLICATION_JSON)
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(jsonRequestBody);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk())
+                .andExpect(content().json(TestUtilities.toJsonString(expectedBookList)))
+                .andDo(print());
+    }
+
+    @Test
+    void givenABookList_whenGetRequestedOnUpdateWithBooksToBeAdded_thenBooksAreAddedToBookList() throws Exception {
+
+        final String bookListId = "existing-book-list";
+        final Set<String> booksToBeAdded = new HashSet<>(Arrays.asList("book-id-1", "book-id-2", "book-id-3"));
+
+        final BookList originalBookList = new BookList();
+        originalBookList.setId(bookListId);
+
+        final BookList expectedBookList = new BookList();
+        expectedBookList.setId(bookListId);
+        expectedBookList.setBooks(booksToBeAdded);
+
+        when(bookListRepository.findById(bookListId)).thenReturn(Optional.of(originalBookList));
+        when(bookListRepository.save(expectedBookList)).thenReturn(expectedBookList);
+
+        final ShelfDto shelfDto = new ShelfDto();
+        shelfDto.setBooksToBeAdded(booksToBeAdded);
         final String jsonRequestBody = TestUtilities.toJsonString(shelfDto);
 
         final MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
@@ -77,7 +112,7 @@ class BookListControllerTest {
 
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isOk())
-                .andExpect(content().json(TestUtilities.toJsonString(updatedBookList)))
+                .andExpect(content().json(TestUtilities.toJsonString(expectedBookList)))
                 .andDo(print());
     }
 }
