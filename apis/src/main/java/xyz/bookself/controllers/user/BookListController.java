@@ -46,13 +46,14 @@ public class BookListController {
      */
     @GetMapping("/{id}/books")
     public ResponseEntity<Collection<Book>> getBooks(@PathVariable("id") String bookListId) {
-        final Collection<String>bookIdsInList = bookListRepository.findAllBookIdInList(bookListId, apiConfiguration.getMaxReturnedBooks());
 
+        final Collection<String>bookIdsInList = bookListRepository.findAllBookIdInList(bookListId, apiConfiguration.getMaxReturnedBooks());
         final Collection<Book> booksInList = new ArrayList<>();
-        for(String bookId : bookIdsInList)
-        {
+        
+        for(String bookId : bookIdsInList) {
             booksInList.add(bookRepository.findById(bookId).orElseThrow());
         }
+        
         return new ResponseEntity<>(booksInList, HttpStatus.OK);
     }
 
