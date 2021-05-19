@@ -30,6 +30,7 @@ public class BookselfApplication {
 			@Override
 			public void addCorsMappings(CorsRegistry registry) {
 				registry.addMapping("/**").allowedOrigins(corsConfiguration.getAllowedOrigins());
+				registry.addMapping("/**").allowedMethods("*").allowedOrigins(corsConfiguration.getAllowedOrigins());
 			}
 		};
 	}
