@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @SpringBootTest
 @AutoConfigureMockMvc
-public class BookListControllerTest {
+class BookListControllerTest {
 
     private final String apiPrefix = "/v1/book-lists";
 
