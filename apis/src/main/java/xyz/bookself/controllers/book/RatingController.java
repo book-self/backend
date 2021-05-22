@@ -15,9 +15,10 @@ import xyz.bookself.users.repository.UserRepository;
 import javax.validation.Valid;
 
 @RestController
-@RequestMapping("/v1/books/{bookId}/rating")
+@RequestMapping(RatingController.REQUEST_MAPPING_PATH)
 @Slf4j
 public class RatingController {
+    public static final String REQUEST_MAPPING_PATH = "/v1/books/{bookId}/rating";
 
     private final RatingRepository ratingRepository;
     private final UserRepository userRepository;
@@ -33,13 +34,12 @@ public class RatingController {
     public ResponseEntity<Void> saveNewRating(@PathVariable("bookId") String bookId,
                                               @AuthenticationPrincipal BookselfUserDetails userDetails,
                                               @RequestBody @Valid RatingDTO ratingDTO) {
-        if (userDetails == null) {
+        if (userDetails == null || !userRepository.existsById(userDetails.getId())) {
             throw new UnauthorizedException();
         }
-        var user = userRepository.findById(userDetails.getId()).orElseThrow(UnauthorizedException::new);
         var book = bookRepository.findById(bookId).orElseThrow(BadRequestException::new);
 
-        var rating = new Rating(book, user, ratingDTO.getRating(), ratingDTO.getComment());
+        var rating = new Rating(book, userDetails.getId(), ratingDTO.getRating(), ratingDTO.getComment());
         ratingRepository.save(rating);
         return ResponseEntity.accepted().build();
     }

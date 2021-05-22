@@ -2,7 +2,6 @@ package xyz.bookself.books.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
-import xyz.bookself.users.domain.User;
 
 import javax.persistence.*;
 
@@ -20,10 +19,11 @@ public class Rating {
     @JoinColumn(name = "book_id", nullable = false)
     private Book book;
 
-    @JsonIgnore
-    @ManyToOne
-    @JoinColumn(name = "user_id", nullable = false)
-    private User user;
+    /**
+     * Not using ManyToOne here to prevent a circular dependency with the user-service module
+     */
+    @Column(name = "user_id", nullable = false)
+    private Integer userId;
 
     @Column(nullable = false)
     private Integer rating;
@@ -33,9 +33,9 @@ public class Rating {
 
     public Rating() { }
 
-    public Rating(Book book, User user, Integer rating, String comment) {
+    public Rating(Book book, Integer userId, Integer rating, String comment) {
         this.book = book;
-        this.user = user;
+        this.userId = userId;
         this.rating = rating;
         this.comment = comment;
     }

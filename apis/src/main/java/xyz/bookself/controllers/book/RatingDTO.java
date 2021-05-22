@@ -2,10 +2,12 @@ package xyz.bookself.controllers.book;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 
 import javax.validation.constraints.Max;
 import javax.validation.constraints.Min;
 
+@Getter
 public class RatingDTO {
 
     @Min(0) @Max(5)
@@ -19,14 +21,6 @@ public class RatingDTO {
                      @JsonProperty("comment") String comment) {
         this.rating = rating;
         this.comment = comment;
-    }
-
-    public int getRating() {
-        return rating;
-    }
-
-    public String getComment() {
-        return comment;
     }
 
 }
