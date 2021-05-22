@@ -31,6 +31,9 @@ public class Rating {
     @Column
     private String comment;
 
+    /**
+     * No arg constructor used by JPA
+     */
     public Rating() { }
 
     public Rating(Book book, Integer userId, Integer rating, String comment) {

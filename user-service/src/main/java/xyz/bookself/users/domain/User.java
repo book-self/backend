@@ -27,10 +27,6 @@ public class User {
     private String passwordHash;
 
     private LocalDate created;
-//
-//    @JsonIgnore
-//    @OneToMany(mappedBy = "user")
-//    private Set<Rating> ratings;
 
     @Override
     public boolean equals(Object o) {
