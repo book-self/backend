@@ -40,16 +40,15 @@ create or replace function update_book_average_ratings() returns trigger as $$
 
         -- Calculate the average and upsert the averages table
         select avg(rating) into _average_rating from book_ratings where book_id = _book_id;
-        -- There's no need to delete the average rating row since it'll cascade delete when the book is removed
         if _average_rating is null then
-            raise notice 'No ratings found for %', _book_id;
-        else
-            -- If we got here we have a rating to upsert
-            raise notice 'Updating average rating for % to %', _book_id, _average_rating;
-            insert into book_average_ratings(book_id, average_rating) values(_book_id, _average_rating)
-            on conflict (book_id) do update set average_rating = _average_rating;
+            raise notice 'No ratings found for %. Setting to zero.', _book_id;
+            _average_rating = 0.0;
         end if;
 
+        -- If we got here we have a rating to upsert
+        raise notice 'Updating average rating for % to %', _book_id, _average_rating;
+        insert into book_average_ratings(book_id, average_rating) values(_book_id, _average_rating)
+            on conflict (book_id) do update set average_rating = _average_rating;
         return null; -- result is ignored since this is an AFTER trigger
     end
     $$ language plpgsql;
