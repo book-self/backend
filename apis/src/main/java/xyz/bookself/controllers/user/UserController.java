@@ -85,6 +85,7 @@ public class UserController {
     @GetMapping("/{id}/book-lists")
     public ResponseEntity<Collection<BookList>> getBookLists(@PathVariable Integer id) {
         final Collection<BookList> lists = bookListRepository.findUserBookLists(id);
+        
         return new ResponseEntity<>(lists, HttpStatus.OK);
     }
 
