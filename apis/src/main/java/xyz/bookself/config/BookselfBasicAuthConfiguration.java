@@ -9,10 +9,11 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import xyz.bookself.security.BookselfUserDetailsService;
 
 /**
- * Sets up the API to require auth on all endpoints but /pint (can't do auth here due to load balancer health checking)
+ * Sets up the API to require auth on all endpoints but /ping (can't do auth here due to load balancer health checking)
  *
  * Uses the {@link xyz.bookself.security.BookselfUserDetailsService} to check the database for a user and
  * {@link BCryptPasswordEncoder} to deal with comparing the plain text password to the hash we have in the DB.
@@ -43,6 +44,9 @@ public class BookselfBasicAuthConfiguration extends WebSecurityConfigurerAdapter
                 .antMatchers("/**").permitAll() // Allow everything -- override at the Controller level on a method-by-method basis
                 .and()
                 .csrf().disable()
-                .httpBasic();
+                .httpBasic()
+                .and()
+            .logout()
+                .logoutRequestMatcher(new AntPathRequestMatcher("/v1/auth/signout"));
     }
 }

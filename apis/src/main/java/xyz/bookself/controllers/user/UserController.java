@@ -60,6 +60,18 @@ public class UserController {
                 .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
+    @GetMapping("/current-user")
+    public ResponseEntity<User> getCurrentUser(@AuthenticationPrincipal BookselfUserDetails userDetails) {
+        // If nobody is logged in, UNAUTHORIZED
+        if (userDetails == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        return userRepository.findById(userDetails.getId())
+                .map(u -> new ResponseEntity<>(u, HttpStatus.OK))
+                .orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
+    }
+
     @PostMapping(value = "/new-user", consumes = {MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<User>createNewUser(@RequestBody UserDto userDto){
         User newUser = new User();
