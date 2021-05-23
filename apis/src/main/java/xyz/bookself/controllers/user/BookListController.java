@@ -80,7 +80,7 @@ public class BookListController {
         final Set<String> booksToBeAdded = shelfDto.getBooksToBeAdded();
         final Set<String> booksToBeRemoved = shelfDto.getBooksToBeRemoved();
         final String newBookListId = shelfDto.getNewBookListId();
-        
+
         final BookList shelf = bookListRepository.findById(id).orElseThrow();
         final BookList addShelf = bookListRepository.findById(newBookListId).orElseThrow();
         boolean updated = false;
