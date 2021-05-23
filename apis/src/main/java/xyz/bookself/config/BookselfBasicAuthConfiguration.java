@@ -47,6 +47,8 @@ public class BookselfBasicAuthConfiguration extends WebSecurityConfigurerAdapter
                 .httpBasic()
                 .and()
             .logout()
-                .logoutRequestMatcher(new AntPathRequestMatcher("/v1/auth/signout"));
+                .logoutRequestMatcher(new AntPathRequestMatcher("/v1/auth/signout"))
+                .invalidateHttpSession(true)
+                .deleteCookies("JSESSIONID");
     }
 }
