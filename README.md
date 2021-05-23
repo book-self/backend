@@ -60,5 +60,4 @@ POST | `/v1/books/{bookId}/rating` | Add a new rating to the book (authenticated
 PATCH | `/v1/books/{bookId}/rating/{ratingId}` | Update rating (authenticated request)
 DELETE | `/v1/books/{bookId}/rating/{ratingId}` | Update rating (authenticated request)
 GET | `/v1/users/{id}` | Get user by id
-GET | `/v1/users/current-user` | Get currently signed in user
 POST | `/v1/users/new-user` | Add a new user
