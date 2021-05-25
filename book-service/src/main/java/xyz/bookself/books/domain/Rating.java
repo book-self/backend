@@ -1,6 +1,7 @@
 package xyz.bookself.books.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
 
 import javax.persistence.*;
@@ -12,6 +13,7 @@ public class Rating {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @JsonView(RatingDTOViews.RatingDTOWithIdView.class)
     private Integer id;
 
     @JsonIgnore
@@ -26,9 +28,11 @@ public class Rating {
     private Integer userId;
 
     @Column(nullable = false)
+    @JsonView(RatingDTOViews.RatingDTOWithIdView.class)
     private Integer rating;
 
     @Column
+    @JsonView(RatingDTOViews.RatingDTOWithIdView.class)
     private String comment;
 
     /**

@@ -1,11 +1,14 @@
 package xyz.bookself.controllers.book;
 
+import com.fasterxml.jackson.annotation.JsonView;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+import xyz.bookself.books.domain.Book;
 import xyz.bookself.books.domain.Rating;
+import xyz.bookself.books.domain.RatingDTOViews;
 import xyz.bookself.books.repository.BookRepository;
 import xyz.bookself.books.repository.RatingRepository;
 import xyz.bookself.exceptions.BadRequestException;
@@ -31,6 +34,24 @@ public class RatingController {
         this.ratingRepository = ratingRepository;
         this.userRepository = userRepository;
         this.bookRepository = bookRepository;
+    }
+
+    @JsonView(RatingDTOViews.RatingDTOWithIdView.class)
+    @GetMapping
+    public Rating getRating(
+        @PathVariable("bookId") String bookId,
+        @AuthenticationPrincipal BookselfUserDetails userDetails
+    ) {
+        // Make sure the user is authenticated and known
+        if (userDetails == null || !userRepository.existsById(userDetails.getId())) {
+            throw new UnauthorizedException();
+        }
+
+        // Make sure it's a known book
+        var book = bookRepository.findById(bookId).orElseThrow(BadRequestException::new);
+
+        // have they reviewed this book before?
+        return ratingRepository.findRatingByUserForBook(userDetails.getId(), bookId).orElseThrow(NotFoundException::new);
     }
 
     @PostMapping
@@ -95,5 +116,4 @@ public class RatingController {
         ratingRepository.delete(rating);
         return ResponseEntity.ok().build();
     }
-
 }
