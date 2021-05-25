@@ -28,7 +28,7 @@ public class BookDTO {
     private final String blurb;
     @JsonProperty("pages")
     private final int pages;
-    @JsonProperty("datePublished")
+    @JsonProperty("published")
     private final LocalDate datePublished;
     @JsonProperty("ratings")
     private final Set<RatingDTO> ratings;
@@ -42,7 +42,7 @@ public class BookDTO {
                    @JsonProperty("authors") Set<AuthorDTO> authors,
                    @JsonProperty("blurb") String blurb,
                    @JsonProperty("pages") int pages,
-                   @JsonProperty("datePublished") LocalDate datePublished,
+                   @JsonProperty("published") LocalDate datePublished,
                    @JsonProperty("ratings") Set<RatingDTO> ratings,
                    @JsonProperty("averageRating") Double averageRating) {
         this.id = id;
@@ -65,7 +65,7 @@ public class BookDTO {
         this.pages = book.getPages();
         this.datePublished = book.getPublished();
         this.ratings = book.getRatings() == null ? emptySet() : book.getRatings().stream().map(RatingDTO::new).collect(Collectors.toSet());
-        this.averageRating = Optional.of(book).map(Book::getAverageRating).map(AverageRating::getAverageRating).orElse(0.0);
+        this.averageRating = Optional.of(book).map(Book::getAverageRating).map(AverageRating::getAverageRating).orElse(null); // Mapping so we can flatten, still a null if not found
     }
 
 }
