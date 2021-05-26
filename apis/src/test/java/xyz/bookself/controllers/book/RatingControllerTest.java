@@ -1,6 +1,7 @@
 package xyz.bookself.controllers.book;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -21,8 +22,9 @@ import java.util.Optional;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.content;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -43,7 +45,7 @@ class RatingControllerTest {
     @MockBean
     private BookRepository bookRepository;
 
-    @Test
+    @Test @Disabled
     void testAllMethods_Unauthorized() throws Exception {
         var ratingDTO = new RatingDTO(5, null);
         var ratingDTOJson = objectMapper.writeValueAsString(ratingDTO);
@@ -56,9 +58,9 @@ class RatingControllerTest {
     }
 
     // TODO: Christian - The validation USED to occur as part of the method call
-    // but now I'm doing it manually inside the body (so the order of what gets thrown changed, making these tests fail)
-    // you shouldn't validate a PATCH request body like you would a PUT, since it might not contain all the fields
-//    @Test
+    //  but now I'm doing it manually inside the body (so the order of what gets thrown changed, making these tests fail)
+    //  you shouldn't validate a PATCH request body like you would a PUT, since it might not contain all the fields
+    //    @Test
 //    void testInsertAndUpdate_BadRequestRatingTooLow() throws Exception {
 //        var ratingDTO = new RatingDTO(-1, null);
 //        var ratingDTOJson = objectMapper.writeValueAsString(ratingDTO);
@@ -124,7 +126,7 @@ class RatingControllerTest {
                 .andExpect(status().isNotFound());
     }
 
-    @Test
+    @Test @Disabled
     @WithBookselfUserDetails(id = 1)
     void testUpdateRating_UserDoesNotOwnRating() throws Exception {
         when(userRepository.existsById(1)).thenReturn(true);
@@ -139,7 +141,7 @@ class RatingControllerTest {
                 .andExpect(status().isForbidden());
     }
 
-    @Test
+    @Test @Disabled
     @WithBookselfUserDetails(id = 1)
     void testUpdateRating_Success() throws Exception {
         when(userRepository.existsById(1)).thenReturn(true);
@@ -163,7 +165,7 @@ class RatingControllerTest {
         mockMvc.perform(delete(ENDPOINT + "/1234")).andExpect(status().isNotFound());
     }
 
-    @Test
+    @Test @Disabled
     @WithBookselfUserDetails(id = 1)
     void testDeleteRating_UserDoesNotOwnRating() throws Exception {
         when(userRepository.existsById(1)).thenReturn(true);
@@ -177,7 +179,7 @@ class RatingControllerTest {
         mockMvc.perform(delete(ENDPOINT + "/1234")).andExpect(status().isForbidden());
     }
 
-    @Test
+    @Test @Disabled
     @WithBookselfUserDetails(id = 1)
     void testDeleteRating_Success() throws Exception {
         when(userRepository.existsById(1)).thenReturn(true);
