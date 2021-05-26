@@ -7,10 +7,15 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import xyz.bookself.security.BookselfUserDetailsService;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 /**
  * Sets up the API to require auth on all endpoints but /ping (can't do auth here due to load balancer health checking)
@@ -38,6 +43,7 @@ public class BookselfBasicAuthConfiguration extends WebSecurityConfigurerAdapter
         auth.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
     }
 
+
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http.authorizeRequests()
@@ -47,8 +53,26 @@ public class BookselfBasicAuthConfiguration extends WebSecurityConfigurerAdapter
                 .httpBasic()
                 .and()
             .logout()
-                .logoutRequestMatcher(new AntPathRequestMatcher("/v1/auth/signout"))
+                .logoutRequestMatcher(new AntPathRequestMatcher("/v1/auth/signout", "POST"))
+                .addLogoutHandler(new BookselfLogoutHandler())
                 .invalidateHttpSession(true)
                 .deleteCookies("JSESSIONID");
+    }
+}
+
+class BookselfLogoutHandler implements LogoutHandler {
+    /**
+     * Fix CORS on
+     * @param request
+     * @param response
+     * @param authentication
+     */
+    @Override
+    public void logout(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            Authentication authentication) {
+
+        response.setHeader("Access-Control-Allow-Origin", "*");
     }
 }
