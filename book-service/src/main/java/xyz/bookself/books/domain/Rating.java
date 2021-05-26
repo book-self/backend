@@ -14,7 +14,6 @@ public class Rating {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JsonView(RatingDTOViews.RatingDTOWithIdView.class)
     private Integer id;
 
     @JsonIgnore
@@ -29,14 +28,15 @@ public class Rating {
     private Integer userId;
 
     @Column(nullable = false)
-    @JsonView(RatingDTOViews.RatingDTOWithIdView.class)
+    @JsonView(RatingDTOViews.Rating_Comment_CreatedTimeView.class)
     private Integer rating;
 
     @Column
-    @JsonView(RatingDTOViews.RatingDTOWithIdView.class)
+    @JsonView(RatingDTOViews.Rating_Comment_CreatedTimeView.class)
     private String comment;
 
     @Column(name = "created_time")
+    @JsonView(RatingDTOViews.Rating_Comment_CreatedTimeView.class)
     private LocalDateTime createdTime;
 
     /**
@@ -49,5 +49,6 @@ public class Rating {
         this.userId = userId;
         this.rating = rating;
         this.comment = comment;
+        this.createdTime = LocalDateTime.now(); // TODO Christian: verify this works
     }
 }
