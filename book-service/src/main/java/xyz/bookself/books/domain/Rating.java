@@ -5,6 +5,7 @@ import com.fasterxml.jackson.annotation.JsonView;
 import lombok.Data;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Data
 @Entity
@@ -34,6 +35,9 @@ public class Rating {
     @Column
     @JsonView(RatingDTOViews.RatingDTOWithIdView.class)
     private String comment;
+
+    @Column(name = "created_time")
+    private LocalDateTime createdTime;
 
     /**
      * No arg constructor used by JPA
