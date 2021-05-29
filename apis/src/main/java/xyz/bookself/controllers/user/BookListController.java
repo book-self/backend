@@ -119,7 +119,7 @@ public class BookListController {
         final BookList addShelf = bookListRepository.findById(newBookListId).orElseThrow();
         boolean updated = false;
 
-        f(Objects.nonNull(booksToBeAdded) && !booksToBeAdded.isEmpty()) {
+        if(Objects.nonNull(booksToBeAdded) && !booksToBeAdded.isEmpty()){
             final Set<String> booksInList = addShelf.getBooks();
             booksInList.addAll(booksToBeAdded);
             bookListRepository.save(addShelf);

@@ -160,19 +160,59 @@ class BookListControllerTest {
 
     @Test
     void givenBooksToBeMovedToADifferentList_thenBooksAreMovedToADifferentList() throws Exception{
-        final Set<String> originalSetOfBooks = new HashSet<>(Collections.singletonList("book-id-1"));
-        final Set<String> booksToBeRemoveThenAdded = new HashSet<>(Arrays.asList("book-id-2", "book-id-3"));
-        final Set<String> updatedSetOfBooks = new HashSet<>(Arrays.asList("book-id-1", "book-id-2", "book-id-3"));
-        final Set<String> updatedSetOfBooksRemove = new HashSet<>(Arrays.asList(""));
 
+        final String bookListId = "existing-book-list";
+        final String newBookListId = "second-existing-book-list";
 
-    }
-
-    @Test
-    void givenBooksToBeRemove_thenBooksAreRemovedFromBookList() throws Exception{
-        final Set<String> updatedSetOfBooks = new HashSet<>(Collections.singletonList("book-id-1"));
-        final Set<String> booksToBeRemoved = new HashSet<>(Arrays.asList("book-id-2", "book-id-3"));
         final Set<String> originalSetOfBooks = new HashSet<>(Arrays.asList("book-id-1", "book-id-2", "book-id-3"));
+        final Set<String> booksToBeRemoved = new HashSet<>(Arrays.asList("book-id-2", "book-id-3"));
+        final Set<String> updatedSetOfBooks = new HashSet<>(Collections.singletonList("book-id-1"));
+
+        final Set<String> setOfBookToBeAddedTo = new HashSet<>(Collections.singletonList("book-id-4"));
+        final Set<String> updatedSetOfBooksAfterAdd = new HashSet<>(Arrays.asList("book-id-4", "book-id-2", "book-id-3"));
+
+        final BookList originalBookList = new BookList();
+        originalBookList.setId(bookListId);
+        originalBookList.setBooks(originalSetOfBooks);
+
+        final BookList expectedBookList = new BookList();
+        expectedBookList.setId(bookListId);
+        expectedBookList.setBooks(updatedSetOfBooks);
+
+        final BookList originalBookListToBeAddedTo = new BookList();
+        originalBookListToBeAddedTo.setId(newBookListId);
+        originalBookListToBeAddedTo.setBooks(setOfBookToBeAddedTo);
+
+        final BookList expectedBookListAfterAdd = new BookList();
+        expectedBookListAfterAdd.setId(newBookListId);
+        expectedBookListAfterAdd.setBooks(updatedSetOfBooksAfterAdd);
+
+
+        final MoveShelfDTO moveShelfDTO = new MoveShelfDTO();
+        moveShelfDTO.setBooksToBeRemoved(booksToBeRemoved);
+        moveShelfDTO.setBooksToBeAdded(booksToBeRemoved);
+        moveShelfDTO.setNewBookListId(newBookListId);
+
+        final String jsonRequestBody = TestUtilities.toJsonString(moveShelfDTO);
+
+        when(bookListRepository.findById(bookListId)).thenReturn(Optional.of(originalBookList));
+        when(bookListRepository.findById(newBookListId)).thenReturn(Optional.of(originalBookListToBeAddedTo));
+
+        when(bookListRepository.save(expectedBookListAfterAdd)).thenReturn(expectedBookListAfterAdd);
+        when(bookListRepository.save(expectedBookList)).thenReturn(expectedBookList);
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .put(apiPrefix + "/" + bookListId + "/move-books")
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(jsonRequestBody);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk())
+                .andExpect(content().json(TestUtilities.toJsonString(expectedBookList)))
+                .andDo(print());
+
 
     }
+    
 }
