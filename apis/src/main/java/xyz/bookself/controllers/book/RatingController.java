@@ -56,7 +56,7 @@ public class RatingController {
         var book = bookRepository.findById(bookId).orElseThrow(BadRequestException::new);
 
         // have they reviewed this book before?
-        return ratingRepository.findRatingByUserForBook(userDetails.getId(), bookId).orElseThrow(NotFoundException::new);
+        return ratingRepository.findLatestRatingByUserForBook(userDetails.getId(), bookId).orElseThrow(NotFoundException::new);
     }
 
     @ResponseStatus(HttpStatus.CREATED)
@@ -90,7 +90,7 @@ public class RatingController {
             throw new NotFoundException();
         }
 
-        var rating = ratingRepository.findRatingByUserForBook(userDetails.getId(), bookId).orElseThrow(NotFoundException::new);
+        var rating = ratingRepository.findLatestRatingByUserForBook(userDetails.getId(), bookId).orElseThrow(NotFoundException::new);
         if (!userDetails.getId().equals(rating.getUserId())) {
             throw new ForbiddenException();
         }
@@ -142,7 +142,7 @@ public class RatingController {
         }
 
         // Find the rating
-        var rating = ratingRepository.findRatingByUserForBook(userDetails.getId(), bookId).orElseThrow(NotFoundException::new);
+        var rating = ratingRepository.findLatestRatingByUserForBook(userDetails.getId(), bookId).orElseThrow(NotFoundException::new);
         if (!userDetails.getId().equals(rating.getUserId())) {
             throw new ForbiddenException();
         }

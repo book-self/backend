@@ -76,7 +76,7 @@ class RatingControllerTest {
         var rating = new Rating();
         rating.setId(1234);
         rating.setUserId(authenticatedUserId);
-        when(ratingRepository.findRatingByUserForBook(authenticatedUserId, ratedBookId)).thenReturn(Optional.of(rating));
+        when(ratingRepository.findLatestRatingByUserForBook(authenticatedUserId, ratedBookId)).thenReturn(Optional.of(rating));
 
         var ratingDTO = new RatingDTO(-1, null);
         var ratingDTOJson = objectMapper.writeValueAsString(ratingDTO);
@@ -100,7 +100,7 @@ class RatingControllerTest {
         var rating = new Rating();
         rating.setId(1234);
         rating.setUserId(authenticatedUserId);
-        when(ratingRepository.findRatingByUserForBook(authenticatedUserId, ratedBookId)).thenReturn(Optional.of(rating));
+        when(ratingRepository.findLatestRatingByUserForBook(authenticatedUserId, ratedBookId)).thenReturn(Optional.of(rating));
 
         var ratingDTO = new RatingDTO(6, null);
         var ratingDTOJson = objectMapper.writeValueAsString(ratingDTO);
@@ -163,7 +163,7 @@ class RatingControllerTest {
         var rating = new Rating();
         rating.setId(1234);
         rating.setUserId(2); // Different than authenticated user
-        when(ratingRepository.findRatingByUserForBook(authenticatedUserId, ratedBookId)).thenReturn(Optional.of(rating));
+        when(ratingRepository.findLatestRatingByUserForBook(authenticatedUserId, ratedBookId)).thenReturn(Optional.of(rating));
         var ratingDTO = new RatingDTO(5, null);
         var ratingDTOJson = objectMapper.writeValueAsString(ratingDTO);
         mockMvc.perform(patch(ENDPOINT).content(ratingDTOJson).contentType(MediaType.APPLICATION_JSON))
@@ -180,7 +180,7 @@ class RatingControllerTest {
         rating.setId(1234);
         rating.setUserId(authenticatedUserId);
 
-        when(ratingRepository.findRatingByUserForBook(authenticatedUserId,ratedBookId)).thenReturn(Optional.of(rating));
+        when(ratingRepository.findLatestRatingByUserForBook(authenticatedUserId,ratedBookId)).thenReturn(Optional.of(rating));
 
         var ratingDTO = new RatingDTO(5, null);
         var ratingDTOJson = objectMapper.writeValueAsString(ratingDTO);
@@ -207,7 +207,7 @@ class RatingControllerTest {
         var rating = new Rating();
         rating.setId(1234);
         rating.setUserId(2); // Different than authenticated user
-        when(ratingRepository.findRatingByUserForBook(authenticatedUserId, ratedBookId)).thenReturn(Optional.of(rating));
+        when(ratingRepository.findLatestRatingByUserForBook(authenticatedUserId, ratedBookId)).thenReturn(Optional.of(rating));
         mockMvc.perform(delete(ENDPOINT)).andExpect(status().isForbidden());
     }
 
@@ -219,7 +219,7 @@ class RatingControllerTest {
         var rating = new Rating();
         rating.setId(1234);
         rating.setUserId(authenticatedUserId);
-        when(ratingRepository.findRatingByUserForBook(authenticatedUserId, ratedBookId)).thenReturn(Optional.of(rating));
+        when(ratingRepository.findLatestRatingByUserForBook(authenticatedUserId, ratedBookId)).thenReturn(Optional.of(rating));
         mockMvc.perform(delete(ENDPOINT)).andExpect(status().isOk());
     }
 }
