@@ -157,4 +157,22 @@ class BookListControllerTest {
                 .andExpect(content().json(TestUtilities.toJsonString(expectedBookList)))
                 .andDo(print());
     }
+
+    @Test
+    void givenBooksToBeMovedToADifferentList_thenBooksAreMovedToADifferentList() throws Exception{
+        final Set<String> originalSetOfBooks = new HashSet<>(Collections.singletonList("book-id-1"));
+        final Set<String> booksToBeRemoveThenAdded = new HashSet<>(Arrays.asList("book-id-2", "book-id-3"));
+        final Set<String> updatedSetOfBooks = new HashSet<>(Arrays.asList("book-id-1", "book-id-2", "book-id-3"));
+        final Set<String> updatedSetOfBooksRemove = new HashSet<>(Arrays.asList(""));
+
+
+    }
+
+    @Test
+    void givenBooksToBeRemove_thenBooksAreRemovedFromBookList() throws Exception{
+        final Set<String> updatedSetOfBooks = new HashSet<>(Collections.singletonList("book-id-1"));
+        final Set<String> booksToBeRemoved = new HashSet<>(Arrays.asList("book-id-2", "book-id-3"));
+        final Set<String> originalSetOfBooks = new HashSet<>(Arrays.asList("book-id-1", "book-id-2", "book-id-3"));
+
+    }
 }
