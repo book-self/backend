@@ -52,110 +52,39 @@ class BookListControllerTest {
     }
 
     @Test
-    void givenABookList_whenGetRequestedOnUpdateWithNewName_thenBookListIsRenamed() throws Exception {
-
-        final String bookListId = "existing-book-list";
-        final String originalListName = "Original List Name";
-        final String newListName = "New List Name";
-
-        final BookList originalBookList = new BookList();
-        originalBookList.setId(bookListId);
-        originalBookList.setBookListName(originalListName);
-
-        final BookList expectedBookList = new BookList();
-        expectedBookList.setId(bookListId);
-        expectedBookList.setBookListName(newListName);
-
-        final ShelfDto shelfDto = new ShelfDto();
-        shelfDto.setNewListName(newListName);
-        shelfDto.setNewBookListId(bookListId);
-        final String jsonRequestBody = TestUtilities.toJsonString(shelfDto);
-
-        when(bookListRepository.findById(bookListId)).thenReturn(Optional.of(originalBookList));
-        when(bookListRepository.save(expectedBookList)).thenReturn(expectedBookList);
-
-        final MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .put(apiPrefix + "/" + bookListId + "/update")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonRequestBody);
-
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk())
-                .andExpect(content().json(TestUtilities.toJsonString(expectedBookList)))
-                .andDo(print());
-    }
-
-    @Test
-    void givenABookList_whenGetRequestedOnUpdateWithBooksToBeAdded_thenBooksAreAddedToBookList() throws Exception {
-
-        final String bookListId = "existing-book-list";
-        final Set<String> originalSetOfBooks = new HashSet<>(Collections.singletonList("book-id-1"));
-        final Set<String> booksToBeAdded = new HashSet<>(Arrays.asList("book-id-2", "book-id-3"));
-        final Set<String> updatedSetOfBooks = new HashSet<>(Arrays.asList("book-id-1", "book-id-2", "book-id-3"));
+    void givenNewBookListName_whenSubmitChange_thenBookListNameShouldBeChanged()
+        throws Exception{
+        final String bookListId = "book-list-id";
+        final String oldBookListName = "old-book-list-name";
+        final String newBookListName = "new-book-list-name";
 
         final BookList originalBookList = new BookList();
         originalBookList.setId(bookListId);
-        originalBookList.setBooks(originalSetOfBooks);
+        originalBookList.setBookListName(oldBookListName);
 
-        final BookList expectedBookList = new BookList();
-        expectedBookList.setId(bookListId);
-        expectedBookList.setBooks(updatedSetOfBooks);
+        final BookList renamedBookList = new BookList();
+        renamedBookList.setId(bookListId);
+        renamedBookList.setBookListName(newBookListName);
 
-        when(bookListRepository.findById(bookListId)).thenReturn(Optional.of(originalBookList));
-        when(bookListRepository.save(expectedBookList)).thenReturn(expectedBookList);
+        final ShelfNameDTO shelfNameDTO = new ShelfNameDTO();
+        shelfNameDTO.setNewListName(newBookListName);
 
-        final ShelfDto shelfDto = new ShelfDto();
-        shelfDto.setBooksToBeAdded(booksToBeAdded);
-        shelfDto.setNewBookListId(bookListId);
-        final String jsonRequestBody = TestUtilities.toJsonString(shelfDto);
-
-        final MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .put(apiPrefix + "/" + bookListId + "/update")
-                .accept(MediaType.APPLICATION_JSON)
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(jsonRequestBody);
-
-        mockMvc.perform(requestBuilder)
-                .andExpect(status().isOk())
-                .andExpect(content().json(TestUtilities.toJsonString(expectedBookList)))
-                .andDo(print());
-    }
-
-    @Test
-    void givenABookList_whenGetRequestedOnUpdateWithBooksToBeRemoved_thenBooksAreRemovedFromBookList() throws Exception {
-        final String bookListId = "existing-book-list";
-
-        final Set<String> originalSetOfBooks = new HashSet<>(Arrays.asList("book-id-1", "book-id-2", "book-id-3"));
-        final Set<String> booksToBeRemoved = new HashSet<>(Arrays.asList("book-id-2", "book-id-3"));
-        final Set<String> updatedSetOfBooks = new HashSet<>(Collections.singletonList("book-id-1"));
-
-        final BookList originalBookList = new BookList();
-        originalBookList.setId(bookListId);
-        originalBookList.setBooks(originalSetOfBooks);
-
-        final BookList expectedBookList = new BookList();
-        expectedBookList.setId(bookListId);
-        expectedBookList.setBooks(updatedSetOfBooks);
-
-        final ShelfDto shelfDto = new ShelfDto();
-        shelfDto.setBooksToBeRemoved(booksToBeRemoved);
-        shelfDto.setNewBookListId(bookListId);
-        final String jsonRequestBody = TestUtilities.toJsonString(shelfDto);
+        final String jsonRequestBody = TestUtilities.toJsonString(shelfNameDTO);
 
         when(bookListRepository.findById(bookListId)).thenReturn(Optional.of(originalBookList));
-        when(bookListRepository.save(expectedBookList)).thenReturn(expectedBookList);
+        when(bookListRepository.save(renamedBookList)).thenReturn(renamedBookList);
 
         MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
-                .put(apiPrefix + "/" + bookListId + "/update")
+                .put(apiPrefix + "/" + bookListId + "/update-list-name")
                 .contentType(MediaType.APPLICATION_JSON)
                 .accept(MediaType.APPLICATION_JSON)
                 .content(jsonRequestBody);
 
         mockMvc.perform(requestBuilder)
                 .andExpect(status().isOk())
-                .andExpect(content().json(TestUtilities.toJsonString(expectedBookList)))
+                .andExpect(content().json(TestUtilities.toJsonString(renamedBookList)))
                 .andDo(print());
+
     }
 
     @Test
@@ -214,5 +143,5 @@ class BookListControllerTest {
 
 
     }
-    
+
 }
