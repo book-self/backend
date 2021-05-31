@@ -5,15 +5,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import xyz.bookself.books.domain.Author;
 import xyz.bookself.books.domain.Book;
+import xyz.bookself.books.repository.AuthorRepository;
 import xyz.bookself.books.repository.BookRepository;
 import xyz.bookself.config.BookselfApiConfiguration;
+import xyz.bookself.controllers.book.BookDTO;
 import xyz.bookself.users.domain.BookList;
 import xyz.bookself.users.repository.BookListRepository;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Objects;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/v1/recommendations")
@@ -23,6 +25,7 @@ public class RecommendationEngine {
     private final BookListRepository bookListRepository;
     private final BookRepository bookRepository;
 
+
     @Autowired
     public RecommendationEngine(BookselfApiConfiguration configuration, BookListRepository repository, BookRepository bookRepository) {
         this.apiConfiguration = configuration;
@@ -31,28 +34,57 @@ public class RecommendationEngine {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Collection<Book>> getRecommendation(@PathVariable("id") Integer userId,
-                                                              @RequestParam(name = "authorId", required = false) String authorId,
-                                                              @RequestParam(name = "genre", required = false) String genre) {
-        final Collection<Book> booksInList = new ArrayList<>();
-        if(Objects.nonNull(authorId) && !(authorId.isEmpty())) {
-            //do author book recommendation
+    public ResponseEntity<Collection<BookDTO>> getRecommendation(@PathVariable("id") Integer userId, @RequestParam(name = "recommend-by", required = true) Integer recommendBy) {
 
-            //what if no authors
-        }
-        else if(genre != null && !(genre.isEmpty()))
+        Collection<String> readBookListId = bookListRepository.findAllBooksInUserReadBookList(userId);
+
+        if(readBookListId.size() != 0)
         {
-            //genre recommendation
+            if(recommendBy != null)
+            {
+                final Collection<String> informationCollection = new HashSet<>();
+                if(recommendBy == 0)
+                {
+                    //recommend by author
+                    Set<Author> foundAuthors;
+                    for(String bookId : readBookListId) {
+                        foundAuthors = bookRepository.findById(bookId).orElseThrow().getAuthors();
+                        for(Author author: foundAuthors)
+                        {
+                            informationCollection.add(author.getId());
+                        }
 
-            //what if no genre
+                    }
+
+                    String authorId = informationCollection.stream().findFirst().get();
+
+                    final var books = bookRepository.findAllByAuthor(authorId, apiConfiguration.getMaxReturnedBooks())
+                            .stream().map(BookDTO::new).collect(Collectors.toSet());
+                    return new ResponseEntity<>(books, HttpStatus.OK);
+                }
+                else if (recommendBy == 1)
+                {
+                    //need all the genres that user had read
+                    Set<String> genreList;
+                    for(String bookId : readBookListId) {
+                        genreList = bookRepository.findById(bookId).orElseThrow().getGenres();
+                        for (String genre : genreList)
+                        {
+                            informationCollection.add(genre);
+                        }
+                    }
+
+                    String genre = informationCollection.stream().findFirst().get();
+                    final var books = bookRepository.findAllByGenre(genre, apiConfiguration.getMaxReturnedBooks())
+                            .stream().map(BookDTO::new).collect(Collectors.toSet());
+                    return new ResponseEntity<>(books, HttpStatus.OK);
+                }
+            }
+
+
         }
-        else
-        {
-            //what happens when both genre and author are empty
-            //for now return empty 
-        }
 
 
-        return new ResponseEntity<>(booksInList, HttpStatus.OK);
+        return new ResponseEntity<>(null, HttpStatus.OK);
     }
 }
