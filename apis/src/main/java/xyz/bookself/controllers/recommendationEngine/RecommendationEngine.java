@@ -57,8 +57,11 @@ public class RecommendationEngine {
                     }
 
                     String authorId = informationCollection.stream().findFirst().get();
-
-                    final var books = bookRepository.findAllByAuthor(authorId, apiConfiguration.getMaxReturnedBooks())
+                    //go through each author and
+                    //bookRepository.findAllByAuthor(genre, 1).stream().map(BookDTO::new)
+                    //add to collection
+                    //min recommendation number is 5
+                    final var books = bookRepository.findAllByAuthor(authorId, 1)
                             .stream().map(BookDTO::new).collect(Collectors.toSet());
                     return new ResponseEntity<>(books, HttpStatus.OK);
                 }
@@ -75,7 +78,12 @@ public class RecommendationEngine {
                     }
 
                     String genre = informationCollection.stream().findFirst().get();
-                    final var books = bookRepository.findAllByGenre(genre, apiConfiguration.getMaxReturnedBooks())
+                    //go through each genre and
+                    //bookRepository.findAllByGenre(genre, 1).stream().map(BookDTO::new)
+                    //add to collection
+                    //min recommendation number is 5
+                    //temporary placeholder code.
+                    final var books = bookRepository.findAllByGenre(genre, 1)
                             .stream().map(BookDTO::new).collect(Collectors.toSet());
                     return new ResponseEntity<>(books, HttpStatus.OK);
                 }
