@@ -3,6 +3,7 @@ package xyz.bookself.config;
 import io.micrometer.cloudwatch2.CloudWatchConfig;
 import io.micrometer.cloudwatch2.CloudWatchMeterRegistry;
 import io.micrometer.core.instrument.Clock;
+import io.micrometer.core.instrument.Tag;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +16,9 @@ import software.amazon.awssdk.auth.credentials.AwsCredentialsProvider;
 import software.amazon.awssdk.auth.credentials.StaticCredentialsProvider;
 import software.amazon.awssdk.regions.Region;
 import software.amazon.awssdk.services.cloudwatch.CloudWatchAsyncClient;
+
+import java.util.List;
+import java.util.Optional;
 
 @Configuration
 @ConditionalOnProperty(value = "bookself.aws.cloudwatch.enabled", havingValue = "true")
@@ -43,6 +47,13 @@ public class CloudWatchConfiguration {
 
     @Bean
     CloudWatchMeterRegistry cloudWatchMeterRegistry(CloudWatchConfig config, CloudWatchAsyncClient client) {
-        return new CloudWatchMeterRegistry(config, Clock.SYSTEM, client);
+        var registry = new CloudWatchMeterRegistry(config, Clock.SYSTEM, client);
+        registry.config().commonTags(commonTags());
+        return registry;
+    }
+
+    private Iterable<Tag> commonTags() {
+        var hostname = Optional.ofNullable(System.getenv("HOSTNAME")).orElse("UNKNOWN");
+        return List.of(Tag.of("hostname", hostname));
     }
 }
