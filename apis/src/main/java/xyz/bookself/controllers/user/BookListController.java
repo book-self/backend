@@ -12,6 +12,7 @@ import xyz.bookself.config.BookselfApiConfiguration;
 import xyz.bookself.users.domain.BookList;
 import xyz.bookself.users.repository.BookListRepository;
 
+import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
@@ -58,7 +59,7 @@ public class BookListController {
     }
 
     @PutMapping(value = "/{id}/update-list-name", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<BookList> renameShelf(@PathVariable String id, @RequestBody ShelfNameDTO shelfNameDTO) {
+    public ResponseEntity<BookList> renameShelf(@PathVariable String id, @Valid @RequestBody ShelfNameDTO shelfNameDTO) {
 
         final String newListName = shelfNameDTO.getNewListName();
 
