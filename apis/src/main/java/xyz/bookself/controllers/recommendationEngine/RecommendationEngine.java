@@ -34,7 +34,7 @@ public class RecommendationEngine {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Collection<BookDTO>> getRecommendation(@PathVariable("id") Integer userId, @RequestParam(name = "recommend-by", required = true) Integer recommendBy) {
+    public ResponseEntity<Collection<BookDTO>> getRecommendation(@PathVariable("id") Integer userId, @RequestParam(name = "recommend-by", required = true) String recommendBy) {
 
         Collection<String> readBookListId = bookListRepository.findAllBooksInUserReadBookList(userId);
 
@@ -43,7 +43,7 @@ public class RecommendationEngine {
             if(recommendBy != null)
             {
                 final Collection<String> informationCollection = new HashSet<>();
-                if(recommendBy == 0)
+                if(recommendBy.equalsIgnoreCase("author"))
                 {
                     //recommend by author
                     Set<Author> foundAuthors;
@@ -62,7 +62,7 @@ public class RecommendationEngine {
                             .stream().map(BookDTO::new).collect(Collectors.toSet());
                     return new ResponseEntity<>(books, HttpStatus.OK);
                 }
-                else if (recommendBy == 1)
+                else if (recommendBy.equalsIgnoreCase("genre"))
                 {
                     //need all the genres that user had read
                     Set<String> genreList;
