@@ -103,4 +103,35 @@ public class BookListController {
 
         return new ResponseEntity<>((updated) ? bookListRepository.save(shelf) : shelf, HttpStatus.OK);
     }
+
+    @PutMapping(value ="/{id}" , consumes = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<BookList> updateBookListBookList(@PathVariable String id,  @RequestBody ShelfDto shelfDto) {
+        final String newListName = shelfDto.getNewListName();
+        final Set<String> booksToBeAdded = shelfDto.getBooksToBeAdded();
+        final Set<String> booksToBeRemoved = shelfDto.getBooksToBeRemoved();
+
+        final String newBookListId = shelfDto.getNewBookListId();
+
+        final BookList shelf = bookListRepository.findById(id).orElseThrow();
+        final BookList addShelf = bookListRepository.findById(newBookListId).orElseThrow();
+        boolean updated = false;
+
+        if(Objects.nonNull(newListName)) {
+            shelf.setBookListName(newListName);
+            updated = true;
+        }
+        if(Objects.nonNull(booksToBeAdded) && !booksToBeAdded.isEmpty()){
+            final Set<String> booksInList = addShelf.getBooks();
+            booksInList.addAll(booksToBeAdded);
+            bookListRepository.save(addShelf);
+            updated = true;
+        }
+
+        if(Objects.nonNull(booksToBeRemoved) && !booksToBeRemoved.isEmpty()) {
+            final Set<String> booksInList = shelf.getBooks();
+            booksInList.removeAll(booksToBeRemoved);
+            updated = true;
+        }
+        return new ResponseEntity<>((updated) ? bookListRepository.save(shelf) : shelf, HttpStatus.OK);
+    }
 }
