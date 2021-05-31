@@ -144,4 +144,38 @@ class BookListControllerTest {
 
     }
 
+    @Test
+    void givenNameChange_butNoBookMovement_thenNameOfListIsUpdatedAndNoBooksAreMoved() throws Exception{
+        final String bookListId = "book-list-id";
+        final String oldBookListName = "old-book-list-name";
+        final String newBookListName = "new-book-list-name";
+
+        final BookList originalBookList = new BookList();
+        originalBookList.setId(bookListId);
+        originalBookList.setBookListName(oldBookListName);
+
+        final BookList renamedBookList = new BookList();
+        renamedBookList.setId(bookListId);
+        renamedBookList.setBookListName(newBookListName);
+
+        ShelfDto shelfDto = new ShelfDto();
+        shelfDto.setNewListName(newBookListName);
+        shelfDto.setNewBookListId(bookListId);
+
+        final String jsonRequestBody = TestUtilities.toJsonString(shelfDto);
+        when(bookListRepository.findById(bookListId)).thenReturn(Optional.of(originalBookList));
+        when(bookListRepository.save(renamedBookList)).thenReturn(renamedBookList);
+
+        MockHttpServletRequestBuilder requestBuilder = MockMvcRequestBuilders
+                .put(apiPrefix + "/" + bookListId)
+                .contentType(MediaType.APPLICATION_JSON)
+                .accept(MediaType.APPLICATION_JSON)
+                .content(jsonRequestBody);
+
+        mockMvc.perform(requestBuilder)
+                .andExpect(status().isOk())
+                .andExpect(content().json(TestUtilities.toJsonString(renamedBookList)))
+                .andDo(print());
+
+    }
 }
