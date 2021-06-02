@@ -9,6 +9,7 @@ import xyz.bookself.books.domain.Author;
 import xyz.bookself.books.domain.Book;
 import xyz.bookself.books.repository.AuthorRepository;
 import xyz.bookself.books.repository.BookRepository;
+import xyz.bookself.books.repository.RatingRepository;
 import xyz.bookself.config.BookselfApiConfiguration;
 import xyz.bookself.controllers.book.BookDTO;
 import xyz.bookself.users.domain.BookList;
@@ -24,13 +25,15 @@ public class RecommendationEngine {
     private final BookselfApiConfiguration apiConfiguration;
     private final BookListRepository bookListRepository;
     private final BookRepository bookRepository;
+    private final RatingRepository ratingRepository;
 
 
     @Autowired
-    public RecommendationEngine(BookselfApiConfiguration configuration, BookListRepository repository, BookRepository bookRepository) {
+    public RecommendationEngine(BookselfApiConfiguration configuration, BookListRepository repository, BookRepository bookRepository, RatingRepository ratingRepository) {
         this.apiConfiguration = configuration;
         this.bookListRepository = repository;
         this.bookRepository = bookRepository;
+        this.ratingRepository = ratingRepository;
     }
 
     @GetMapping("/{id}")
