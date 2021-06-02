@@ -3,5 +3,6 @@ bookself:
     max-returned-books: 60
     max-returned-genres: 12
     max-returned-authors: 20
+    max-popular-books-count: 100
   cors:
     allowed-origins: ${BOOKSELF_CORS_ALLOWED_ORIGINS:*}

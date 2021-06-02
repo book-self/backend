@@ -10,7 +10,9 @@ import xyz.bookself.books.repository.BookRepository;
 import xyz.bookself.books.repository.RatingRepository;
 import xyz.bookself.services.PopularityService;
 
+import java.util.List;
 import java.util.Map;
+import java.util.stream.IntStream;
 
 @RestController
 @RequestMapping(PopularityController.POPULAR_ENDPOINT)
@@ -33,8 +35,7 @@ public class PopularityController {
 
     @GetMapping("")
     public Integer ratings() {
-        final Map<Book, Double> rankings = popularityService.getRankingsByRating();
-        rankings.keySet().stream().limit(20).forEach(r -> log.info(r.getId() + " -> " + rankings.get(r)));
-        return rankings.size();
+        popularityService.getRankingsByRating();
+        return 1;
     }
 }
