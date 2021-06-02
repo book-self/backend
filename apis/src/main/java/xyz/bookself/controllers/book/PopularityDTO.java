@@ -3,6 +3,7 @@ package xyz.bookself.controllers.book;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import xyz.bookself.books.domain.GenrePopularity;
 import xyz.bookself.books.domain.Popularity;
 
 @Getter
@@ -19,6 +20,11 @@ public class PopularityDTO {
     }
 
     public PopularityDTO(Popularity popularity) {
+        this.bookId = popularity.getBook().getId();
+        this.rank = popularity.getRank();
+    }
+
+    public PopularityDTO(GenrePopularity popularity) {
         this.bookId = popularity.getBook().getId();
         this.rank = popularity.getRank();
     }

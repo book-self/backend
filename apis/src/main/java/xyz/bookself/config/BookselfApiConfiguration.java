@@ -12,4 +12,5 @@ public class BookselfApiConfiguration {
     private int maxReturnedGenres;
     private int maxReturnedAuthors;
     private int maxPopularBooksCount;
+    private int maxPopularBooksByGenreCount;
 }
