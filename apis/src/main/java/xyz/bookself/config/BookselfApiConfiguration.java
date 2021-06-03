@@ -13,4 +13,5 @@ public class BookselfApiConfiguration {
     private int maxReturnedAuthors;
     private int maxPopularBooksCount;
     private int maxPopularBooksByGenreCount;
+    private String popularityComputationCronSchedule;
 }

@@ -15,7 +15,6 @@ import xyz.bookself.config.BookselfApiConfiguration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -36,6 +35,8 @@ import static java.util.stream.Collectors.toSet;
 @Slf4j
 public class PopularityService {
 
+    public static final String CRON_SCHEDULE = "0 7 * * * *";
+
     private final RatingRepository ratingRepository;
     private final BookselfApiConfiguration apiConfiguration;
     private final PopularityRepository popularityRepository;
@@ -51,8 +52,8 @@ public class PopularityService {
         this.genrePopularityRepository = genrePopularityRepository;
     }
 
-    @Scheduled(cron = "0 7 * * * *")
-    public void getRankingsByRating() {
+    @Scheduled(cron = CRON_SCHEDULE)
+    public void computePopularityRanks() {
         log.info("BEGIN SCHEDULED TASK");
 
         final Map<Book, Set<Rating>> ratingsGroupedByBooks = getRatingsGroupedByBook();

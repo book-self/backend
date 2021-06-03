@@ -18,8 +18,11 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 @Data
 @Entity
-@Table(name = "popular_books_by_genre")
+@Table(name = GenrePopularity.TABLE_NAME)
 public class GenrePopularity {
+
+    public static final String TABLE_NAME = "popular_books_by_genre";
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
