@@ -12,8 +12,6 @@ import xyz.bookself.books.repository.PopularityRepository;
 import xyz.bookself.books.repository.RatingRepository;
 import xyz.bookself.config.BookselfApiConfiguration;
 
-import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -35,27 +33,27 @@ import static java.util.stream.Collectors.toSet;
 @Slf4j
 public class PopularityService {
 
-    public static final String CRON_SCHEDULE = "0 7 * * * *";
-
     private final RatingRepository ratingRepository;
     private final BookselfApiConfiguration apiConfiguration;
     private final PopularityRepository popularityRepository;
     private final GenrePopularityRepository genrePopularityRepository;
+    private final TimestampFactory timestampFactory;
 
     public PopularityService(RatingRepository ratingRepository,
                              BookselfApiConfiguration configuration,
                              PopularityRepository popularityRepository,
-                             GenrePopularityRepository genrePopularityRepository) {
+                             GenrePopularityRepository genrePopularityRepository,
+                             TimestampFactory timestampFactory) {
         this.ratingRepository = ratingRepository;
         this.apiConfiguration = configuration;
         this.popularityRepository = popularityRepository;
         this.genrePopularityRepository = genrePopularityRepository;
+        this.timestampFactory = timestampFactory;
     }
 
-    @Scheduled(cron = CRON_SCHEDULE)
+    @Scheduled(cron = "${bookself.api.popularity-cron-schedule}")
     public void computePopularityRanks() {
-        log.info("BEGIN SCHEDULED TASK");
-
+        log.info("Begin computing popularity...");
         final Map<Book, Set<Rating>> ratingsGroupedByBooks = getRatingsGroupedByBook();
         final Map<Book, Double> averageRatings = new HashMap<>();
 
@@ -67,7 +65,7 @@ public class PopularityService {
                     * (1.0 / ratings.size());
             averageRatings.put(book, averageRating);
         });
-        log.info("SCHEDULED TASK - done computing popularity...");
+        log.info("Done computing popularity...");
 
         final Map<Book, Double> rankedBooks = averageRatings.entrySet()
                 .stream()
@@ -79,19 +77,27 @@ public class PopularityService {
                         (oldValue, newValue) -> oldValue,
                         LinkedHashMap::new
                 ));
-        log.info("SCHEDULED TASK - done ranking books by popularity...");
+        log.info("Done ranking books by popularity...");
+
+        // Remove previous rankings - no history :(
+        popularityRepository.clean();
+        log.info("Done deleting previous popularity ranks...");
 
         rankedBooks.keySet()
                 .forEach(withRankCounter((rank, book) -> {
                     final Popularity popularity = new Popularity();
                     popularity.setBook(book);
                     popularity.setRank(rank);
-                    popularity.setRankedTime(LocalDateTime.now(ZoneId.of("UTC")));
+                    popularity.setRankedTime(timestampFactory.getTimestamp());
                     popularityRepository.save(popularity);
                 }));
-        log.info("SCHEDULED TASK - done persisting popularity ranks...");
+        log.info("Done persisting popularity ranks...");
 
         final Map<String, List<String>> inverted = invertBookRankingToGenreRanking(rankedBooks);
+
+        // Remove previous rankings - no history :(
+        genrePopularityRepository.clean();
+        log.info("Done deleting previous genre popularity ranks...");
 
         inverted.keySet().forEach(genre -> inverted.get(genre).forEach(withRankCounter((rank, book) -> {
                 final GenrePopularity genrePopularity = new GenrePopularity();
@@ -100,13 +106,11 @@ public class PopularityService {
                 genrePopularity.setGenre(genre);
                 genrePopularity.setBook(b);
                 genrePopularity.setRank(rank);
-                genrePopularity.setRankedTime(LocalDateTime.now(ZoneId.of("UTC")));
+                genrePopularity.setRankedTime(timestampFactory.getTimestamp());
                 genrePopularityRepository.save(genrePopularity);
             }))
         );
-        log.info("SCHEDULED TASK - done persisting genre popularity ranks...");
-
-        log.info("END SCHEDULED TASK");
+        log.info("Done persisting genre popularity ranks...");
     }
 
     private Map<Book, Set<Rating>> getRatingsGroupedByBook() {

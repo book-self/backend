@@ -2,6 +2,7 @@ package xyz.bookself.services;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.scheduling.config.CronTask;
@@ -27,8 +28,10 @@ import static org.mockito.Mockito.when;
 @SpringBootTest
 public class PopularityServiceTest {
 
-    private final String cronExpression = PopularityService.CRON_SCHEDULE;
     private final String cronTaskString = "xyz.bookself.services.PopularityService.computePopularityRanks";
+
+    @Value("${bookself.api.popularity-cron-schedule}")
+    private String cronExpression;
 
     @Autowired
     private ScheduledTaskHolder scheduledTaskHolder;
@@ -44,6 +47,9 @@ public class PopularityServiceTest {
 
     @MockBean
     private GenrePopularityRepository genrePopularityRepository;
+
+    @MockBean
+    private TimestampFactory timestampFactory;
 
     @Test
     void popularityComputationScheduledTaskIsProperlySetup() {
@@ -61,16 +67,8 @@ public class PopularityServiceTest {
     void givenRatings_whenScheduledTaskRuns_thenRanksAreGenerated() {
 
         init();
-        mockRatingRepository();
-        mockPopularityRepository();
-        mockGenrePopularityRepository();
 
         popularityService.computePopularityRanks();
-
-        // rankedTime fails test when exact argument is verified with p1, p2.
-        // Actual invocations have different arguments - the LocalDateTime is different than initialized.
-        // verify(popularityRepository).save(p1);
-        // verify(popularityRepository).save(p2);
 
         verify(ratingRepository, times(1)).findAll();
         verify(popularityRepository, times(2)).save(any());
@@ -87,6 +85,49 @@ public class PopularityServiceTest {
      *    |   b2    |   21    |  5   |       inverted: | Politics -> b2
      *                                                 |    Peace -> b1
      */
+    private void init() {
+
+        when(timestampFactory.getTimestamp()).thenReturn(LocalDateTime.MIN);
+
+        mockRatingRepository();
+        mockPopularityRepository();
+        mockGenrePopularityRepository();
+
+        b1.setId("b1");
+        b1.setGenres(Set.of("War", "Peace"));
+
+        b2.setId("b2");
+        b2.setGenres(Set.of("War", "Politics"));
+
+        p1.setBook(b1);
+        p1.setRank(2);
+        p1.setRankedTime(timestampFactory.getTimestamp());
+
+        p2.setBook(b2);
+        p2.setRank(1);
+        p2.setRankedTime(timestampFactory.getTimestamp());
+
+        gp1.setGenre("War");
+        gp1.setBook(b2);
+        gp1.setRank(1);
+        gp1.setRankedTime(timestampFactory.getTimestamp());
+
+        gp2.setGenre("War");
+        gp2.setBook(b1);
+        gp2.setRank(2);
+        gp2.setRankedTime(timestampFactory.getTimestamp());
+
+        gp3.setGenre("Politics");
+        gp3.setBook(b2);
+        gp3.setRank(1);
+        gp3.setRankedTime(timestampFactory.getTimestamp());
+
+        gp4.setGenre("Peace");
+        gp4.setBook(b1);
+        gp4.setRank(1);
+        gp4.setRankedTime(timestampFactory.getTimestamp());
+    }
+
     private void mockRatingRepository() {
         final Rating r1 = new Rating(b1, 20, 5, "comment");
         final Rating r2 = new Rating(b1, 30, 4, "comment");
@@ -107,42 +148,6 @@ public class PopularityServiceTest {
         when(genrePopularityRepository.save(gp2)).thenReturn(gp2);
         when(genrePopularityRepository.save(gp3)).thenReturn(gp3);
         when(genrePopularityRepository.save(gp4)).thenReturn(gp4);
-    }
-
-    private void init() {
-        b1.setId("b1");
-        b1.setGenres(Set.of("War", "Peace"));
-
-        b2.setId("b2");
-        b2.setGenres(Set.of("War", "Politics"));
-
-        p1.setBook(b2);
-        p1.setRank(1);
-        p1.setRankedTime(LocalDateTime.MIN);
-
-        p2.setBook(b1);
-        p2.setRank(2);
-        p2.setRankedTime(LocalDateTime.MIN);
-
-        gp1.setGenre("War");
-        gp1.setBook(b2);
-        gp1.setRank(1);
-        gp1.setRankedTime(LocalDateTime.MIN);
-
-        gp2.setGenre("War");
-        gp2.setBook(b1);
-        gp2.setRank(2);
-        gp2.setRankedTime(LocalDateTime.MIN);
-
-        gp3.setGenre("Politics");
-        gp3.setBook(b2);
-        gp3.setRank(1);
-        gp3.setRankedTime(LocalDateTime.MIN);
-
-        gp4.setGenre("Peace");
-        gp4.setBook(b1);
-        gp4.setRank(1);
-        gp4.setRankedTime(LocalDateTime.MIN);
     }
 
     private final Book b1 = new Book();

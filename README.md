@@ -29,6 +29,7 @@ Environment Variable | Default | Description
 `BOOKSELF_DB_USER` | `postgres` | The database user name
 `BOOKSELF_DB_PASS` |  | The database password
 `BOOKSELF_CORS_ALLOWED_ORIGINS` | `*` | CORS allowed origins (Should be the front-end url unless we want to allow all origins)
+`BOOKSELF_POPULARITY_CRON_SCHEDULE` | `0 0 0 * * *` i.e. Everyday at midnight | Schedule for popularity computation
 
 ### Running the Backend Application
 `$ ./gradlew :apis:bootRun`
@@ -59,3 +60,5 @@ PATCH | `/v1/books/{bookId}/rating` | Update rating (authenticated request) | �
 DELETE | `/v1/books/{bookId}/rating` | Update rating (authenticated request) | ❌ 🔜 `/v1/books/{bookId}/rating/{ratingId}`
 GET | `/v1/users/{id}` | Get user by id | ✅
 POST | `/v1/users/new-user` | Add a new user | ❌ 🔜 `/v1/users`
+GET | `/v1/books/populars` | Get all popular books | ❓
+GET | `/v1/books/populars?genre=Some+Genre` | Get all popular books in a given genre | ❓

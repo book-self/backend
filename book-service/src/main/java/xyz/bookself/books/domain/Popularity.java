@@ -13,7 +13,6 @@ import javax.persistence.JoinColumn;
 import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import java.time.LocalDateTime;
-import java.util.Objects;
 
 @NoArgsConstructor
 @AllArgsConstructor
