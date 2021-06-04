@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import xyz.bookself.books.domain.Author;
 import xyz.bookself.books.domain.Book;
+import xyz.bookself.books.domain.Rating;
 import xyz.bookself.books.repository.AuthorRepository;
 import xyz.bookself.books.repository.BookRepository;
 import xyz.bookself.books.repository.RatingRepository;
@@ -37,7 +38,7 @@ public class RecommendationEngine {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Collection<BookRecommendationDTO>> getRecommendation(@PathVariable("id") Integer userId, @RequestParam(name = "recommend-by", required = true) String recommendBy) {
+    public ResponseEntity<Collection<BookDTO>> getRecommendation(@PathVariable("id") Integer userId, @RequestParam(name = "recommend-by", required = true) String recommendBy) {
 
         Collection<String> readBookListId = bookListRepository.findAllBooksInUserReadBookList(userId);
 
@@ -50,11 +51,16 @@ public class RecommendationEngine {
                 {
                     //recommend by author
                     Set<Author> foundAuthors;
+                    Rating userBookRating;
                     for(String bookId : readBookListId) {
-                        foundAuthors = bookRepository.findById(bookId).orElseThrow().getAuthors();
-                        for(Author author: foundAuthors)
+                        userBookRating = ratingRepository.findLatestRatingByUserForBook(userId, bookId).orElseThrow();
+                        if(userBookRating.getRating() > 2)
                         {
-                            informationCollection.add(author.getId());
+                            foundAuthors = bookRepository.findById(bookId).orElseThrow().getAuthors();
+                            for(Author author: foundAuthors)
+                            {
+                                informationCollection.add(author.getId());
+                            }
                         }
 
                     }
@@ -65,7 +71,7 @@ public class RecommendationEngine {
                     //add to collection
                     //min recommendation number is 5
                     final var books = bookRepository.findAllByAuthor(authorId, 1)
-                            .stream().map(BookRecommendationDTO::new).collect(Collectors.toSet());
+                            .stream().map(BookDTO::new).collect(Collectors.toSet());
                     return new ResponseEntity<>(books, HttpStatus.OK);
                 }
                 else if (recommendBy.equalsIgnoreCase("genre"))
@@ -87,7 +93,7 @@ public class RecommendationEngine {
                     //min recommendation number is 5
                     //temporary placeholder code.
                     final var books = bookRepository.findAllByGenre(genre, 1)
-                            .stream().map(BookRecommendationDTO::new).collect(Collectors.toSet());
+                            .stream().map(BookDTO::new).collect(Collectors.toSet());
                     return new ResponseEntity<>(books, HttpStatus.OK);
                 }
             }
