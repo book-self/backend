@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import xyz.bookself.books.domain.Author;
 import xyz.bookself.books.domain.Book;
@@ -13,8 +14,11 @@ import xyz.bookself.books.repository.BookRepository;
 import xyz.bookself.books.repository.RatingRepository;
 import xyz.bookself.config.BookselfApiConfiguration;
 import xyz.bookself.controllers.book.BookDTO;
+import xyz.bookself.exceptions.UnauthorizedException;
+import xyz.bookself.security.BookselfUserDetails;
 import xyz.bookself.users.domain.BookList;
 import xyz.bookself.users.repository.BookListRepository;
+import xyz.bookself.users.repository.UserRepository;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -27,19 +31,25 @@ public class RecommendationEngine {
     private final BookListRepository bookListRepository;
     private final BookRepository bookRepository;
     private final RatingRepository ratingRepository;
+    private final UserRepository userRepository;
 
 
     @Autowired
-    public RecommendationEngine(BookselfApiConfiguration configuration, BookListRepository repository, BookRepository bookRepository, RatingRepository ratingRepository) {
+    public RecommendationEngine(BookselfApiConfiguration configuration, BookListRepository repository,
+                                BookRepository bookRepository, RatingRepository ratingRepository, UserRepository userRepository) {
         this.apiConfiguration = configuration;
         this.bookListRepository = repository;
         this.bookRepository = bookRepository;
         this.ratingRepository = ratingRepository;
+        this.userRepository = userRepository;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Collection<BookDTO>> getRecommendation(@PathVariable("id") Integer userId, @RequestParam(name = "recommend-by", required = true) String recommendBy) {
+    public ResponseEntity<Collection<BookDTO>> getRecommendation(@PathVariable("id") Integer userId,
+                                                                 @AuthenticationPrincipal BookselfUserDetails userDetails,
+                                                                 @RequestParam(name = "recommend-by", required = true) String recommendBy) {
 
+        throwIfUserDoesNotExist(userDetails);
         Collection<String> readBookListId = bookListRepository.findAllBooksInUserReadBookList(userId);
 
         if(readBookListId.size() != 0)
@@ -104,4 +114,13 @@ public class RecommendationEngine {
 
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
+
+
+    private void throwIfUserDoesNotExist(@AuthenticationPrincipal BookselfUserDetails userDetails) {
+        if (userDetails == null || !userRepository.existsById(userDetails.getId())) {
+            throw new UnauthorizedException();
+        }
+    }
 }
+
+
