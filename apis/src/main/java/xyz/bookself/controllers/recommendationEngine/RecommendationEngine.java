@@ -9,6 +9,7 @@ import xyz.bookself.books.domain.Author;
 import xyz.bookself.books.domain.Book;
 import xyz.bookself.books.repository.AuthorRepository;
 import xyz.bookself.books.repository.BookRepository;
+import xyz.bookself.books.repository.RatingRepository;
 import xyz.bookself.config.BookselfApiConfiguration;
 import xyz.bookself.controllers.book.BookDTO;
 import xyz.bookself.users.domain.BookList;
@@ -24,17 +25,19 @@ public class RecommendationEngine {
     private final BookselfApiConfiguration apiConfiguration;
     private final BookListRepository bookListRepository;
     private final BookRepository bookRepository;
+    private final RatingRepository ratingRepository;
 
 
     @Autowired
-    public RecommendationEngine(BookselfApiConfiguration configuration, BookListRepository repository, BookRepository bookRepository) {
+    public RecommendationEngine(BookselfApiConfiguration configuration, BookListRepository repository, BookRepository bookRepository, RatingRepository ratingRepository) {
         this.apiConfiguration = configuration;
         this.bookListRepository = repository;
         this.bookRepository = bookRepository;
+        this.ratingRepository = ratingRepository;
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Collection<BookDTO>> getRecommendation(@PathVariable("id") Integer userId, @RequestParam(name = "recommend-by", required = true) String recommendBy) {
+    public ResponseEntity<Collection<BookRecommendationDTO>> getRecommendation(@PathVariable("id") Integer userId, @RequestParam(name = "recommend-by", required = true) String recommendBy) {
 
         Collection<String> readBookListId = bookListRepository.findAllBooksInUserReadBookList(userId);
 
@@ -62,7 +65,7 @@ public class RecommendationEngine {
                     //add to collection
                     //min recommendation number is 5
                     final var books = bookRepository.findAllByAuthor(authorId, 1)
-                            .stream().map(BookDTO::new).collect(Collectors.toSet());
+                            .stream().map(BookRecommendationDTO::new).collect(Collectors.toSet());
                     return new ResponseEntity<>(books, HttpStatus.OK);
                 }
                 else if (recommendBy.equalsIgnoreCase("genre"))
@@ -84,7 +87,7 @@ public class RecommendationEngine {
                     //min recommendation number is 5
                     //temporary placeholder code.
                     final var books = bookRepository.findAllByGenre(genre, 1)
-                            .stream().map(BookDTO::new).collect(Collectors.toSet());
+                            .stream().map(BookRecommendationDTO::new).collect(Collectors.toSet());
                     return new ResponseEntity<>(books, HttpStatus.OK);
                 }
             }
