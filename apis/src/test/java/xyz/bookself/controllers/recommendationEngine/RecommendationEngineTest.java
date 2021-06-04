@@ -12,10 +12,17 @@ import xyz.bookself.books.repository.BookRepository;
 import xyz.bookself.books.repository.RatingRepository;
 import xyz.bookself.controllers.book.RatingController;
 import xyz.bookself.users.domain.BookList;
+import xyz.bookself.users.repository.BookListRepository;
 import xyz.bookself.users.repository.UserRepository;
 
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Optional;
+import java.util.Set;
+
+import static org.mockito.Mockito.when;
+
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @SpringBootTest
@@ -38,8 +45,11 @@ public class RecommendationEngineTest {
     @MockBean
     private BookRepository bookRepository;
 
+    @MockBean
+    private BookListRepository bookListRepository;
+
     @Test
-    void whenUserGoesForRecommendationByAuthor_thenTheyAreReturnedABookByAuthor()
+    void whenUnauthorizedUserGoesForRecommendationByAuthorOrGenre_thenStatusIsUnauthorized()
         throws Exception
     {
         final String validBookListId = "99";
@@ -47,8 +57,26 @@ public class RecommendationEngineTest {
         bookListThatExistsInDatabase.setId(validBookListId);
         mockMvc.perform(get(apiPrefix + "/" + unauthorizedUser).param("recommend-by", "author"))
                 .andExpect(status().isUnauthorized());
+        mockMvc.perform(get(apiPrefix + "/" + unauthorizedUser).param("recommend-by", "genre"))
+                .andExpect(status().isUnauthorized());
 
-        //when(userRepository.existsById(authenticatedUserId)).thenReturn(true);
+    }
+
+    @Test
+    void whenAuthorizedUserGoesForRecommendationByAuthor_thenReturnABookBySaidAuthor()
+        throws Exception
+    {
+//        final String validBookListId = "99";
+//        final Set<String> setOfBooks = new HashSet<>(Arrays.asList("book-id-1"));
+//        final BookList bookListThatExistsInDatabase = new BookList();
+//        bookListThatExistsInDatabase.setId(validBookListId);
+//
+//        when(userRepository.existsById(authenticatedUserId)).thenReturn(true);
+//
+//        when(bookListRepository.findAllBooksInUserReadBookList(authenticatedUserId)).thenReturn(setOfBooks);
+
+
+
     }
 
 }
