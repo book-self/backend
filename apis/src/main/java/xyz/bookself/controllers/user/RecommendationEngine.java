@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import xyz.bookself.books.domain.Author;
+import xyz.bookself.books.domain.Rating;
 import xyz.bookself.books.repository.BookRepository;
 import xyz.bookself.books.repository.RatingRepository;
 import xyz.bookself.config.BookselfApiConfiguration;
@@ -24,7 +25,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/v1/recommendations")
 @Slf4j
 public class RecommendationEngine {
-    private final BookselfApiConfiguration apiConfiguration;
     private final BookListRepository bookListRepository;
     private final BookRepository bookRepository;
     private final RatingRepository ratingRepository;
@@ -32,10 +32,8 @@ public class RecommendationEngine {
 
 
     @Autowired
-    public RecommendationEngine(BookselfApiConfiguration configuration, BookListRepository repository,
-                                BookRepository bookRepository, RatingRepository ratingRepository,
-                                UserRepository userRepository ) {
-        this.apiConfiguration = configuration;
+    public RecommendationEngine(BookListRepository repository, BookRepository bookRepository,
+                                RatingRepository ratingRepository, UserRepository userRepository ) {
         this.bookListRepository = repository;
         this.bookRepository = bookRepository;
         this.ratingRepository = ratingRepository;
@@ -43,10 +41,11 @@ public class RecommendationEngine {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Collection<BookDTO>> getRecommendation(@PathVariable("id") Integer userId, @AuthenticationPrincipal BookselfUserDetails userDetails,
+    public ResponseEntity<Collection<BookDTO>> getRecommendation(@PathVariable("id") Integer userId,
                                                                  @RequestParam(name = "recommend-by", required = true) String recommendBy) {
+//        @AuthenticationPrincipal BookselfUserDetails userDetails,
+//        throwIfUserDoesNotExist(userDetails);
 
-        throwIfUserDoesNotExist(userDetails);
         Collection<String> readBookListId = bookListRepository.findAllBooksInUserReadBookList(userId);
 
         if(readBookListId.size() != 0)
@@ -64,7 +63,6 @@ public class RecommendationEngine {
                         {
                             informationCollection.add(author.getId());
                         }
-
                     }
 
                     String authorId = informationCollection.stream().findFirst().get();
@@ -72,7 +70,7 @@ public class RecommendationEngine {
                     //bookRepository.findAllByAuthor(genre, 1).stream().map(BookDTO::new)
                     //add to collection
                     //min recommendation number is 5
-                    final var books = bookRepository.findAllByAuthor(authorId, 1)
+                    final var books = bookRepository.findAllByAuthor(authorId, 5)
                             .stream().map(BookDTO::new).collect(Collectors.toSet());
                     return new ResponseEntity<>(books, HttpStatus.OK);
                 }
@@ -88,13 +86,13 @@ public class RecommendationEngine {
                         }
                     }
 
-                    String genre = informationCollection.stream().findFirst().get();
+                    String genre = informationCollection.stream().findAny().get();
                     //go through each genre and
                     //bookRepository.findAllByGenre(genre, 1).stream().map(BookDTO::new)
                     //add to collection
                     //min recommendation number is 5
                     //temporary placeholder code.
-                    final var books = bookRepository.findAllByGenre(genre, 1)
+                    final var books = bookRepository.findAllByGenre(genre, 5)
                             .stream().map(BookDTO::new).collect(Collectors.toSet());
                     return new ResponseEntity<>(books, HttpStatus.OK);
                 }
