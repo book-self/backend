@@ -43,10 +43,10 @@ public class RecommendationEngine {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Collection<BookDTO>> getRecommendation(@PathVariable("id") Integer userId, @AuthenticationPrincipal BookselfUserDetails userDetails,
+    public ResponseEntity<Collection<BookDTO>> getRecommendation(@PathVariable("id") Integer userId,
                                                                  @RequestParam(name = "recommend-by", required = true) String recommendBy) {
 
-        throwIfUserDoesNotExist(userDetails);
+        //throwIfUserDoesNotExist(userDetails);
         Collection<String> readBookListId = bookListRepository.findAllBooksInUserReadBookList(userId);
 
         if(readBookListId.size() != 0)
