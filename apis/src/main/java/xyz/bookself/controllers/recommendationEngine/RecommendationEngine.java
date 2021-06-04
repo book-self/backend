@@ -37,7 +37,7 @@ public class RecommendationEngine {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<Collection<BookRecommendationDTO>> getRecommendation(@PathVariable("id") Integer userId, @RequestParam(name = "recommend-by", required = true) String recommendBy) {
+    public ResponseEntity<Collection<BookDTO>> getRecommendation(@PathVariable("id") Integer userId, @RequestParam(name = "recommend-by", required = true) String recommendBy) {
 
         Collection<String> readBookListId = bookListRepository.findAllBooksInUserReadBookList(userId);
 
@@ -65,7 +65,7 @@ public class RecommendationEngine {
                     //add to collection
                     //min recommendation number is 5
                     final var books = bookRepository.findAllByAuthor(authorId, 1)
-                            .stream().map(BookRecommendationDTO::new).collect(Collectors.toSet());
+                            .stream().map(BookDTO::new).collect(Collectors.toSet());
                     return new ResponseEntity<>(books, HttpStatus.OK);
                 }
                 else if (recommendBy.equalsIgnoreCase("genre"))
@@ -87,14 +87,13 @@ public class RecommendationEngine {
                     //min recommendation number is 5
                     //temporary placeholder code.
                     final var books = bookRepository.findAllByGenre(genre, 1)
-                            .stream().map(BookRecommendationDTO::new).collect(Collectors.toSet());
+                            .stream().map(BookDTO::new).collect(Collectors.toSet());
                     return new ResponseEntity<>(books, HttpStatus.OK);
                 }
             }
 
 
         }
-
 
         return new ResponseEntity<>(null, HttpStatus.OK);
     }
