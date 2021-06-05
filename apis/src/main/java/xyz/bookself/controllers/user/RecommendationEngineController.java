@@ -24,7 +24,7 @@ import java.util.stream.Collectors;
 @RestController
 @RequestMapping("/v1/recommendations")
 @Slf4j
-public class RecommendationEngine {
+public class RecommendationEngineController {
     private final BookListRepository bookListRepository;
     private final BookRepository bookRepository;
     private final RatingRepository ratingRepository;
@@ -65,11 +65,10 @@ public class RecommendationEngine {
                         }
                     }
 
-                    String authorId = informationCollection.stream().findFirst().get();
+                    String authorId = informationCollection.stream().findAny().get();
                     //go through each author and
                     //bookRepository.findAllByAuthor(genre, 1).stream().map(BookDTO::new)
                     //add to collection
-                    //min recommendation number is 5
                     final var books = bookRepository.findAllByAuthor(authorId, 5)
                             .stream().map(BookDTO::new).collect(Collectors.toSet());
                     return new ResponseEntity<>(books, HttpStatus.OK);
