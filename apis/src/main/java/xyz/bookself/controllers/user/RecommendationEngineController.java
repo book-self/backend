@@ -32,7 +32,7 @@ public class RecommendationEngineController {
 
 
     @Autowired
-    public RecommendationEngine(BookListRepository repository, BookRepository bookRepository,
+    public RecommendationEngineController(BookListRepository repository, BookRepository bookRepository,
                                 RatingRepository ratingRepository, UserRepository userRepository ) {
         this.bookListRepository = repository;
         this.bookRepository = bookRepository;
