@@ -3,6 +3,8 @@ package xyz.bookself.controllers.book;
 import io.micrometer.core.annotation.Timed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -12,9 +14,8 @@ import xyz.bookself.config.BookselfApiConfiguration;
 import xyz.bookself.services.BookService;
 import xyz.bookself.services.PopularityService;
 
-import javax.xml.transform.OutputKeys;
 import java.util.Collection;
-import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -97,5 +98,24 @@ public class BookController {
             // would be interesting to extend our filtering logic here; e.g., if we have lots of good matches, we can throw out the bad ones
             .filter(book -> book.rank != 0)
             .collect(Collectors.toList());
+    }
+
+    @GetMapping("/search-pageable")
+    public ResponseEntity<SearchResultsPage> searchPageable(@RequestParam String query, @RequestParam int page) {
+        final int resultsPerPage = apiConfiguration.getSearchResultsPerPage();
+        final Page<BookRank> results = bookRepository.findBooksByQueryPageable(query, PageRequest.of(page, resultsPerPage));
+        final long totalElements = results.getTotalElements();
+        final int totalPages = results.getTotalPages();
+        log.info("Retrieved Page {} of {} out of a total of {} results.", page, totalPages, totalElements);
+        final List<BookWithRankDTO> rankedBooks = results.stream()
+                .map(bookRank -> {
+                    final var book = new BookDTO(bookRepository.findById(bookRank.getId()).orElseThrow());
+                    final var rank = bookRank.getRank();
+                    return new BookWithRankDTO(book, rank);
+                })
+                .sorted(Comparator.reverseOrder())
+                .collect(Collectors.toList());
+        final SearchResultsPage searchResultsPage = new SearchResultsPage(page, totalPages, totalElements, rankedBooks);
+        return new ResponseEntity<>(searchResultsPage, HttpStatus.OK);
     }
 }
