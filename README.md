@@ -52,6 +52,8 @@ GET | `/v1/books?authorId=12345` | Get books by author | ✅
 GET | `/v1/books?genre=Some+Genre` | Get books by genre | ✅
 POST | `/v1/auth/signin` | Sign in | ✅
 POST | `/v1/auth/signout` | Sign out | ✅
+POST | `/v1/auth/forgot-password` | Forgot password | ❓
+POST | `/v1/auth/reset-password` | Reset password | ❓
 GET | `/v1/books/{id}` | Get a book by id | ✅
 GET | `/v1/genres` | Get random genres (the number of genres returned is configurable) | ✅
 GET | `/v1/genres?popular=yes` | Get popular genres (currently only `?popular=yes` works) | ✅
