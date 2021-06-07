@@ -94,7 +94,7 @@ public class AuthController {
         helper.setTo(user.getEmail());
         helper.setText("Hi <strong>"+ user.getUsername() +"</strong>,<br/><br/>" +
                             "To reset your password, please use the following link:<br/><br/>" +
-                            "<a href='"+apiConfiguration.getAppUrl()+"/reset-password/"+resetToken.getToken()+"'>https://bookself.xyz/reset-password/"+resetToken.getToken()+"</a><br/><br/>" +
+                            "<a href='"+apiConfiguration.getAppUrl()+"/reset-password/"+resetToken.getToken()+"'>"+apiConfiguration.getAppUrl()+"/reset-password/"+resetToken.getToken()+"</a><br/><br/>" +
                             "Thanks!<br/>" +
                             "Book Self", true);
 
