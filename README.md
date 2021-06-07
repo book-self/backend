@@ -30,6 +30,11 @@ Environment Variable | Default | Description
 `BOOKSELF_DB_PASS` |  | The database password
 `BOOKSELF_CORS_ALLOWED_ORIGINS` | `*` | CORS allowed origins (Should be the front-end url unless we want to allow all origins)
 `BOOKSELF_POPULARITY_CRON_SCHEDULE` | `0 0 0 * * *` i.e. Everyday at midnight | Schedule for popularity computation
+`BOOKSELF_EMAIL_HOST` | `smtp.gmail.com` | The email host
+`BOOKSELF_EMAIL_PORT` | `587` | The email port
+`BOOKSELF_EMAIL_USER` | `bookselfservice@gmail.com` | The email username
+`BOOKSELF_EMAIL_PASS` | `password` | The email password
+`BOOKSELF_APP_URL` | `https://bookself.xyz` | The URL
 
 ### Running the Backend Application
 `$ ./gradlew :apis:bootRun`
