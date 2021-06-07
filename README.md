@@ -34,7 +34,7 @@ Environment Variable | Default | Description
 `BOOKSELF_EMAIL_PORT` | `587` | The email port
 `BOOKSELF_EMAIL_USER` | `bookselfservice@gmail.com` | The email username
 `BOOKSELF_EMAIL_PASS` | `password` | The email password
-`BOOKSELF_APP_URL` | `https://bookself.xyz` | The URL
+`BOOKSELF_APP_URL` | `https://bookself.xyz` | The app URL
 
 ### Running the Backend Application
 `$ ./gradlew :apis:bootRun`
