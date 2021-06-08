@@ -43,16 +43,17 @@ public class AuthController {
 
     private final BookselfApiConfiguration apiConfiguration;
 
-    @Autowired
-    private JavaMailSender emailSender;
+    private final JavaMailSender emailSender;
 
     @Autowired
     public AuthController(BookselfApiConfiguration configuration,
                           UserRepository userRepository,
-                          PasswordResetTokenRepository tokenRepository) {
+                          PasswordResetTokenRepository tokenRepository,
+                          JavaMailSender mailSender) {
         this.apiConfiguration = configuration;
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
+        this.emailSender = mailSender;
     }
 
     @PostMapping("/signin")
