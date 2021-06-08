@@ -7,6 +7,10 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.web.servlet.MockMvc;
 import xyz.bookself.books.domain.Author;
 import xyz.bookself.books.domain.Book;
@@ -58,6 +62,9 @@ class BookControllerTest {
 
     @Value("${bookself.api.max-popular-books-by-genre-count}")
     private int maxPopularBooksByGenreCount;
+
+    @Value("${bookself.api.search-results-per-page}")
+    private int resultsPerPage;
 
     @Test
     void givenBookExists_whenIdIsSuppliedToBookEndpoint_thenBookIsReturned()
@@ -229,8 +236,42 @@ class BookControllerTest {
         when(bookRepository.findBooksByQuery(query, maxReturnedBooks)).thenReturn(sixtyBooksAsBookRank);
         when(bookRepository.findById("1")).thenReturn(Optional.of(new Book()));
 
-        mockMvc.perform(get(apiPrefix + "/search?q=" + query))
+        mockMvc.perform(get(apiPrefix + "/search").param("q", query))
             .andExpect(status().isOk());
+    }
+
+    @Test
+    void searchPaginatedEndpointShouldThrowExceptionWhenPageIsLessThan1() throws Exception {
+        mockMvc.perform(get(apiPrefix + "/search-paginated")
+                        .param("query", "history")
+                        .param("page", "0"))
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
+    void searchPaginatedEndpointReturns404WhenPageParamIsGreaterThanTotalNumberOfPages() throws Exception {
+        final String query = "Some Query";
+        final Page<BookRank> resultPage  = Page.empty();
+        final int pageTooBig = resultPage.getTotalPages() + 1;
+        when(bookRepository.findBooksByQueryPageable(query, PageRequest.of(pageTooBig - 1, resultsPerPage)))
+                .thenReturn(resultPage);
+        mockMvc.perform(get(apiPrefix + "/search-paginated")
+                .param("query", query)
+                .param("page", Integer.toString(pageTooBig)))
+                .andExpect(status().isNotFound());
+    }
+
+    @Test
+    void searchPaginatedReturnsPagedResults() throws Exception {
+        final String query = "Some Query";
+        final int page = 1;
+        final Page<BookRank> resultPage = new PageImpl<>(getBookRanks(), PageRequest.of(page - 1, 2), 2);
+        when(bookRepository.findBooksByQueryPageable(query, PageRequest.of(page - 1, resultsPerPage)))
+                .thenReturn(resultPage);
+        mockMvc.perform(get(apiPrefix + "/search-paginated")
+                .param("query", query)
+                .param("page", Integer.toString(page)))
+                .andExpect(status().isOk());
     }
 
     @Test
@@ -245,5 +286,37 @@ class BookControllerTest {
                 Collections.emptySet(),
                 5.0);
         assertThat(bookDTO).isNotNull();
+    }
+
+    private List<BookRank> getBookRanks() {
+        final Book b1 = new Book();
+        b1.setId("111");
+        when(bookRepository.findById("111")).thenReturn(Optional.of(b1));
+        final Book b2 = new Book();
+        b2.setId("222");
+        when(bookRepository.findById("222")).thenReturn(Optional.of(b2));
+        final BookRank br1 = new BookRank() {
+            @Override
+            public Double getRank() {
+                return 4.1;
+            }
+
+            @Override
+            public String getId() {
+                return b1.getId();
+            }
+        };
+        final BookRank br2 = new BookRank() {
+            @Override
+            public Double getRank() {
+                return 6.3;
+            }
+
+            @Override
+            public String getId() {
+                return b2.getId();
+            }
+        };
+        return List.of(br1, br2);
     }
 }
