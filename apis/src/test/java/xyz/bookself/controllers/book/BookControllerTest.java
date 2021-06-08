@@ -22,6 +22,7 @@ import xyz.bookself.services.PopularityService;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -199,6 +200,28 @@ class BookControllerTest {
     }
 
     @Test
+    void givenGenre_whenGetRequestedOnBooksByGenre_thenBooksOfThatGenreShouldBeReturned() throws Exception {
+        final String genre = "Some Genre";
+        final Book b1 = new Book();
+        b1.setGenres(Set.of(genre, "Another Genre"));
+        b1.setId("1");
+        final Book b2 = new Book();
+        b2.setGenres(Set.of(genre, "Still Another Genre"));
+        b2.setId("2");
+        final Book b3 = new Book();
+        b3.setGenres(Set.of(genre, "Yet Another Genre"));
+        b3.setId("3");
+        final Set<BookDTO> bookDTOs = Set.of(b1, b2, b3)
+                .stream()
+                .map(BookDTO::new)
+                .collect(Collectors.toSet());
+        when(bookService.findBooksByGenre(genre)).thenReturn(bookDTOs);
+        mockMvc.perform(get(apiPrefix + "/by-genre").param("genre", genre))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(bookDTOs)));
+    }
+
+    @Test
     void givenThereAreEnoughBooks_whenGetRequestedToBooksAll_thenNBooksShouldBeReturned()
             throws Exception {
 
@@ -262,16 +285,31 @@ class BookControllerTest {
     }
 
     @Test
-    void searchPaginatedReturnsPagedResults() throws Exception {
+    void givenQueryAndValidPageNumber_whenGetRequestedOnSearchPaginated_thenHttpStatusShouldBe200()
+            throws Exception {
         final String query = "Some Query";
         final int page = 1;
         final Page<BookRank> resultPage = new PageImpl<>(getBookRanks(), PageRequest.of(page - 1, 2), 2);
         when(bookRepository.findBooksByQueryPageable(query, PageRequest.of(page - 1, resultsPerPage)))
                 .thenReturn(resultPage);
+        final List<BookWithRankDTO> rankedBooks = resultPage.stream()
+                .map(bookRank -> {
+                    final var book = new BookDTO(bookRepository.findById(bookRank.getId()).orElseThrow());
+                    final var rank = bookRank.getRank();
+                    return new BookWithRankDTO(book, rank);
+                })
+                .sorted(Comparator.reverseOrder())
+                .collect(Collectors.toList());
+        final SearchResultsPage searchResultsPage = new SearchResultsPage(
+                page,
+                resultPage.getTotalPages(),
+                resultPage.getTotalElements(),
+                rankedBooks);
         mockMvc.perform(get(apiPrefix + "/search-paginated")
                 .param("query", query)
                 .param("page", Integer.toString(page)))
-                .andExpect(status().isOk());
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(searchResultsPage)));
     }
 
     @Test

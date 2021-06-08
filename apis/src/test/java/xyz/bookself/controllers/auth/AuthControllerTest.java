@@ -8,7 +8,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
+import xyz.bookself.exceptions.NotFoundException;
 import xyz.bookself.security.WithBookselfUserDetails;
 import xyz.bookself.users.domain.PasswordResetToken;
 import xyz.bookself.users.domain.User;
@@ -19,6 +21,7 @@ import java.time.LocalDateTime;
 import java.util.Optional;
 import java.util.UUID;
 
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -32,6 +35,9 @@ public class AuthControllerTest {
 
     @Autowired
     private MockMvc mockMvc;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     @MockBean
     private UserRepository userRepository;
@@ -154,6 +160,14 @@ public class AuthControllerTest {
         mockMvc.perform(post(apiPrefix + "/reset-password").contentType(APPLICATION_JSON_UTF8)
                 .content(requestJson))
                 .andExpect(status().isOk());
+    }
+
+    @Test
+    void forgotPasswordReturnsHttpStatus404WhenUserEmailNotFound() throws Exception {
+        mockMvc.perform(post(apiPrefix + "/forgot-password")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content(objectMapper.writeValueAsString(new User())))
+                .andExpect(status().isNotFound());
     }
 }
 
