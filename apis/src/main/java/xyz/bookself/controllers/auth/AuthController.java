@@ -3,23 +3,21 @@ package xyz.bookself.controllers.auth;
 import io.micrometer.core.annotation.Timed;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import xyz.bookself.config.BookselfApiConfiguration;
+import xyz.bookself.exceptions.BadRequestException;
+import xyz.bookself.exceptions.NotFoundException;
 import xyz.bookself.security.BookselfUserDetails;
-
 import xyz.bookself.users.domain.PasswordResetToken;
 import xyz.bookself.users.domain.User;
 import xyz.bookself.users.repository.PasswordResetTokenRepository;
@@ -43,16 +41,17 @@ public class AuthController {
 
     private final BookselfApiConfiguration apiConfiguration;
 
-    @Autowired
-    private JavaMailSender emailSender;
+    private final JavaMailSender emailSender;
 
     @Autowired
     public AuthController(BookselfApiConfiguration configuration,
                           UserRepository userRepository,
-                          PasswordResetTokenRepository tokenRepository) {
+                          PasswordResetTokenRepository tokenRepository,
+                          JavaMailSender mailSender) {
         this.apiConfiguration = configuration;
         this.userRepository = userRepository;
         this.tokenRepository = tokenRepository;
+        this.emailSender = mailSender;
     }
 
     @PostMapping("/signin")
@@ -71,15 +70,12 @@ public class AuthController {
 
     @PostMapping(value="/forgot-password", consumes={MediaType.APPLICATION_JSON_VALUE})
     public ResponseEntity<Void> forgotPassword(@RequestBody ForgotPasswordDto forgotPasswordDto) throws MessagingException {
-        User user = userRepository.findUserByEmail(forgotPasswordDto.getEmail()).get();
-
-        // Check if email exists or bad request
-        if (user == null) {
-            return new ResponseEntity<>(HttpStatus.BAD_REQUEST);
-        }
+        final User user = userRepository
+                .findUserByEmail(forgotPasswordDto.getEmail())
+                .orElseThrow(NotFoundException::new);
 
         // Create reset token
-        PasswordResetToken resetToken = new PasswordResetToken();
+        final PasswordResetToken resetToken = new PasswordResetToken();
         resetToken.setUser(user);
         resetToken.setToken(UUID.randomUUID().toString());
         resetToken.setCreated(LocalDate.now());
@@ -87,10 +83,10 @@ public class AuthController {
         tokenRepository.save(resetToken);
 
         // Create the email
-        MimeMessage message = emailSender.createMimeMessage();
+        final MimeMessage message = emailSender.createMimeMessage();
         message.setSubject("Book Self - Reset Password");
         message.setFrom("bookselfservice@gmail.com");
-        MimeMessageHelper helper = new MimeMessageHelper(message, true);
+        final MimeMessageHelper helper = new MimeMessageHelper(message, true);
         helper.setTo(user.getEmail());
         helper.setText("Hi <strong>"+ user.getUsername() +"</strong>,<br/><br/>" +
                             "To reset your password, please use the following link:<br/><br/>" +

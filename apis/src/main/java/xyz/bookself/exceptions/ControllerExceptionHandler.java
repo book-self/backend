@@ -24,7 +24,7 @@ public class ControllerExceptionHandler {
     @ResponseStatus(HttpStatus.BAD_REQUEST)
     @ExceptionHandler(IllegalArgumentException.class)
     @ResponseBody
-    public Error handleBadRequest(HttpServletRequest request, NoSuchElementException exception) {
+    public Error handleBadRequest(HttpServletRequest request, IllegalArgumentException exception) {
         log.error(request.getRequestURL().toString(), exception.getLocalizedMessage());
         return new Error(request.getRequestURL().toString(), exception.getLocalizedMessage());
     }

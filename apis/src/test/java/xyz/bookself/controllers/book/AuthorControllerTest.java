@@ -13,6 +13,7 @@ import xyz.bookself.books.repository.AuthorRepository;
 
 import java.util.Collection;
 import java.util.Optional;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -39,6 +40,21 @@ class AuthorControllerTest {
     @Value("${bookself.api.max-returned-authors}")
     private int maxReturnedAuthors;
 
+
+    @Test
+    void givenAuthorsExist_whenGetRequestedOnEndpoint_thenSomeAuthorsShouldBeReturned() throws Exception {
+        final Author a1 = new Author();
+        a1.setId("1");
+        final Author a2 = new Author();
+        a2.setId("2");
+        final Author a3 = new Author();
+        a3.setId("3");
+        final Collection<Author> authors = Set.of(a1, a2, a3);
+        when(authorRepository.findAnyAuthors(maxReturnedAuthors)).thenReturn(authors);
+        mockMvc.perform(get(apiPrefix))
+                .andExpect(status().isOk())
+                .andExpect(content().json(objectMapper.writeValueAsString(authors)));
+    }
 
     @Test
     void givenAuthorExists_whenGetRequestedWithIdOnPath_thenAuthorShouldBeReturned()
